@@ -56,6 +56,7 @@ define((require, exports, module) => {
         _sphere.position.set(px, py, pz);
         let _object = new Object(px, py, pz);
         _object.mass = params.mass;
+        _object.radius = params.radius;
 		_object.color = params.color;
 
         if ( params.v ) {
@@ -73,11 +74,8 @@ define((require, exports, module) => {
     };
 
 	const _next_position = (o, interval) => {
-		let _np = o.p.add(o.v.scale(interval));
-		return _np;
+		return o.p.add(o.v.scale(interval));
 	};
-
-    const _DELTA_THETA = Math.PI / 180;
     
     const _module = {
         
@@ -110,35 +108,29 @@ define((require, exports, module) => {
 
 		            if ( (px >= xmax - o.radius && vx > 0)
 			            || (px <= xmin + o.radius && vx < 0) ) {
-						console.log(`x: before : color=${o.color}, o.v=${o.v}`);
 			            o.v.change([
 				            -1, 0, 0,
 				            0, 1, 0,
 				            0, 0, 1
 			            ]);
-						console.log(`z: after : color=${o.color}, o.v=${o.v}`);
 		            }
 
 		            if ( (py >= ymax - o.radius && vy > 0)
 			            || (py <= ymin + o.radius && vy < 0) ) {
-						console.log(`y: before : color=${o.color}, o.v=${o.v}`);
 			            o.v.change([
 				            1, 0, 0,
 				            0, -1, 0,
 				            0, 0, 1
 			            ]);
-						console.log(`y: after : color=${o.color}, o.v=${o.v}`);
 		            }
 
 		            if ( (pz >= zmax - o.radius && vz > 0)
 			            || (pz <= zmin + o.radius && vz < 0) ) {
-						console.log(`z: before : color=${o.color}, o.v=${o.v}`);
 			            o.v.change([
 				            1, 0, 0,
 				            0, 1, 0,
 				            0, 0, -1
 			            ]);
-						console.log(`z: after : color=${o.color}, o.v=${o.v}`);
 		            }
 	            }
 
@@ -165,8 +157,6 @@ define((require, exports, module) => {
 						
 			            if ( _np1.add(_np2.minus()).length < _dpl ) {
 
-							console.log('before: o.v=' + o.v + ', b.v=' + b.v);
-
 				            let _sd = _dpl * _dpl;
 				            let _dv = o.v.add(b.v.minus());   // o.v - b.v
 
@@ -176,7 +166,6 @@ define((require, exports, module) => {
 
 				            o.v.append(_dp.scale(-_m * b.mass * _a / _sd));
 				            b.v.append(_dp.minus().scale(-_m * o.mass * _a / _sd));
-							console.log('after: o.v=' + o.v + ', b.v=' + b.v);
 			            }
 		            }
 
