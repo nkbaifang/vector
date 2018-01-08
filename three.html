@@ -1,0 +1,100 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>Three JS</title>
+    <script type="text/javascript" src="scripts/require.js"></script>
+    <link type="text/css" rel="stylesheet" href="style/common.css">
+</head>
+<body>
+<canvas id="main" width="600" height="500"></canvas>
+<div>
+    <div class="button button-toggle" id="btn-start">Start</div>
+    <div class="button button-toggle" id="btn-rotate">Rotate</div>
+    <div class="button" id="btn-reset">Reset</div>
+    <div class="button" id="btn-refresh">Refresh</div>
+</div>
+<script type="text/javascript">
+
+	require.config({
+		baseUrl: 'scripts/app',
+		paths: {
+			jquery: '../jquery-3.2.1.min',
+			three: '../three.min'
+		}
+	});
+
+	require(['jquery', 'main3d'], ($, T) => {
+		
+		$(() => {
+
+			$('.button-toggle').click(() => {
+				let _btn = $(event.target);
+				_btn.toggleClass('pressed');
+            });
+
+			$('#btn-refresh').click(() => {
+				window.location.reload(true);
+			});
+			
+			let _btn_start = $('#btn-start');
+			
+			_btn_start.click(() => {
+				if ( _btn_start.hasClass('pressed') ) {
+					T.start();
+					_btn_start.text('Stop');
+				} else {
+					T.stop();
+					_btn_start.text('Start');
+				}
+			});
+
+			$('#btn-reset').click(() => {
+				T.reset();
+				_btn_start.removeClass('pressed').text('Start');
+			});
+
+			$('#btn-rotate').click((event) => {
+				let _btn = $(event.target);
+				T.rotate(_btn.hasClass('pressed'));
+            });
+			
+			const velocity = 10;
+			const mass = 10;
+
+            let _objs = [{
+            	radius: 10,
+                mass: mass,
+                color: 'rgb(0, 255, 0)',
+                p: [0, -100, 0],
+                v: [0, 0, -velocity]
+			//	a: [0, 0, -2]
+            }, {
+            	radius: 10,
+                mass: mass,
+                color: 'rgb(255, 255, 0)',
+                p: [0, 0, -100],
+                v: [0, velocity, 0]
+			//	a: [0, 0, -2]
+            }];
+			T.init({
+				canvas: document.getElementById('main'),
+				camera: {
+					p: [500, 0, 0],
+                    angle: 45
+				},
+                objs: _objs,
+                box: {
+					x: [-200, 200],
+                    y: [-200, 200],
+                    z: [-200, 200]
+                },
+				interval: 0.1,
+				gravity: true
+			});
+
+		});
+	});
+</script>
+</body>
+</html>

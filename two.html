@@ -1,0 +1,84 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<title>Test</title>
+	<script type="text/javascript" src="scripts/require.js"></script>
+	<link type="text/css" rel="stylesheet" href="style/common.css" >
+</head>
+<body>
+	<canvas id="main" width="800" height="800"></canvas>
+	<div>
+		<div class="button" id="btn-start" data-running="false">Start</div>
+		<div class="button" id="btn-reset">Reset</div>
+	</div>
+	<script type="text/javascript">
+	
+		require.config({
+			baseUrl: 'scripts/app',
+			paths: {
+				jquery: '../jquery-3.2.1.min'
+			}
+		});
+		
+		require(['jquery', 'main2d'], ($, M) => {
+		
+			$(() => {
+
+				let _random_int = (min, max) => {
+					return Math.floor(Math.random() * (max - min) + min);
+				};
+
+				let _random_color = () => {
+					let _r = _random_int(0, 256);
+					let _g = _random_int(0, 256);
+					let _b = _random_int(0, 256);
+					return 'rgb(' + _r + ', ' + _g + ', ' + _b + ')';
+				};
+
+				let _create_random_objects = (count) => {
+					let array = [];
+					for ( let i = 0; i < count; i++ ) {
+						let _mass = _random_int(10, 90);
+						let obj = {
+							mass: _mass,
+							radius: Math.floor(Math.sqrt(_mass) * 5),
+							color: _random_color(),
+							v: [_random_int(-20, 20), _random_int(-20, 20)],
+							p: [100 + Math.floor(i % 4) * 200, 100 + Math.floor(i / 4) * 200]
+						};
+						array.push(obj);
+					}
+					return array;
+				};
+				
+				let _btn_start = $('#btn-start');
+				
+				_btn_start.click(() => {
+					let _running = _btn_start.attr('data-running');
+					if ( _running !== 'true' ) {
+						M.start();
+						_btn_start.attr('data-running', 'true').text('Stop');
+					} else {
+						M.stop();
+						_btn_start.attr('data-running', 'false').text('Start');
+					}
+				});
+				
+				$('#btn-reset').click(() => {
+					M.stop();
+					M.reset();
+					_btn_start.attr('data-running', 'false').text('Start');
+				});
+				
+				M.init({
+					canvas: $('#main')[0],
+					objs: _create_random_objects(10),
+					interval: 0.1,
+					gravity: false
+				});
+			});
+		});
+	</script>
+</body>
+</html>
