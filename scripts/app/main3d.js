@@ -21,7 +21,6 @@ define(require => {
     
     const _create_camera = (angle = 75, aspect = 1.0) => {
         let _camera = new THREE.PerspectiveCamera(angle, aspect, 0.5, 1000);
-        //let _camera = new THREE.OrthographicCamera(_FRUSTUM * aspect / -2, _FRUSTUM * aspect / 2, _FRUSTUM / -2, _FRUSTUM / 2, 10, 1000);
         _camera.up.set(0, 0, 1);
         
         return _camera;
@@ -37,7 +36,6 @@ define(require => {
         _renderer.gammaOutput = true;
 
 	    _renderer.shadowMap.enabled = true;
-	    //_renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 	    _renderer.shadowMap.type = THREE.PCFShadowMap;
         
         return _renderer;
@@ -55,22 +53,7 @@ define(require => {
         let _sphere = new THREE.Mesh(_geometry, _material);
         _sphere.position.set(...params.p);
 
-        let _object = Object.of(params);
-        /*
-        _object.mass = params.mass;
-        _object.radius = params.radius;
-		_object.color = params.color;
-
-        if ( params.v ) {
-	        _object.v = new Vector(...params.v);
-        }
-		
-		if ( params.a ) {
-			_object.a = new Vector(...params.a);
-		}
-		*/
-
-        _sphere.object = _object;
+        _sphere.object = Object.of(params);
         return _sphere;
     };
 
@@ -100,14 +83,13 @@ define(require => {
 	    _gravity_to(one, ...others) {
 		    let self = this;
 		    const G = self._config.G;
-		    let _v = others.reduce((v, o) => {
+		    return others.reduce((v, o) => {
 			    let _d = o.p.add(one.p.minus());
 			    let _dl = _d.length;
 			    let _f = G * one.mass * o.mass / (_dl * _dl);
 			    v.append(Vector.of(_f, _d));
 			    return v;
 		    }, Vector.zero(3));
-		    return _v;
 	    },
 
 	    _add_line(start, end, material) {
@@ -169,7 +151,10 @@ define(require => {
 		            }
 
 		            if ( _hit ) {
-		            	o.v.scale(0.9);
+		            	o.v.change([
+		            		0.9, 0,
+				            0, 0.9
+			            ]);
 		            }
 	            }
 
