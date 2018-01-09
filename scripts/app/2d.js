@@ -5,30 +5,14 @@ define(require => {
 	let Vector = require('vector');
 	
 	const ROUND = 2 * Math.PI;
-	const G = 5e+3;
-	
-	class Vector2D extends Vector {
-		
-		constructor(x = 0, y = 0) {
-			super(x, y);
-		}
-		
-		get x() {
-			return this._dim[0];
-		}
-		
-		get y() {
-			return this._dim[1];
-		}
-	}
 	
 	class Point2D {
 		
-		constructor([x = 0, y = 0] = [], [vx = 0, vy = 0] = [], [ax = 0, ay = 0] = []) {
+		constructor(x = 0, y = 0) {
 			let self = this;
-			self._p = new Vector2D(x, y);
-			self._v = new Vector2D(vx, vy);
-			self._a = new Vector2D(ax, ay);
+			self._p = new Vector(x, y);
+			self._v = new Vector(0, 0);
+			self._a = new Vector(0, 0);
 		}
 		
 		get p() {
@@ -59,7 +43,7 @@ define(require => {
 			let self = this;
 			let _v0 = self.v.copy();
 			self.v.append(self.a.scale(t)); // equivalent: v = v0 + a * t
-			self.p.append(_v0.scale(t).add(self._a.scale(0.5 * t * t)));   // equivalent: s = v0 * t + 0.5 * a * t^2
+			self.p.append(_v0.scale(t).add(self.a.scale(0.5 * t * t)));   // equivalent: s = v0 * t + 0.5 * a * t^2
 			return self;
 		}
 		
@@ -84,10 +68,9 @@ define(require => {
 	
 	class Circle2D extends Point2D {
 		
-		constructor(x, y, r = 1, c = 'rgb(0, 0, 0)') {
-			super([x, y]);
+		constructor(x, y, r = 1) {
+			super(x, y);
 			this._radius = r;
-			this._color = c;
 		}
 		
 		get radius() {
@@ -119,10 +102,9 @@ define(require => {
 	
 	class Object2D extends Circle2D {
 		
-		constructor(x, y, m = 1, c = 'rgb(0, 0, 0)' ) {
+		constructor(x, y, m = 1) {
 			super(x, y);
 			this._mass = m;
-			this.color = c;
 			this._fixed = false;
 		}
 		
@@ -157,25 +139,10 @@ define(require => {
 		get energy() {
 			return 0.5 * this.mass * this.v.dot(this.v);
 		}
-		
-		gravityTo(...objs) {
-			let self = this;
-			
-			let _v = objs.reduce((v, o) => {
-				let _d = o.p.add(self.p.minus());
-				let _dl = _d.length;
-				let _f = G * self.mass * o.mass / (_dl * _dl);
-				v.append(Vector.of(_f, _d));
-				return v;
-			}, Vector.zero(2));
-			
-			return _v;
-		}
 	}
 	
 	return {
 		Point: Point2D,
-		Vector: Vector2D,
 		Circle: Circle2D,
 		Object: Object2D
 	};

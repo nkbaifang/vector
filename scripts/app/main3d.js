@@ -1,10 +1,10 @@
-define((require, exports, module) => {
+define(require => {
     'use strict';
-    
-    const THREE = require('three');
-    const GLOBAL = require('global');
 
-    const {Vector, Object} = require('3d');
+	const GLOBAL = require('global');
+    const THREE = require('three');
+    const Vector = require('vector');
+    const {Object} = require('3d');
     
     const _create_scene = () => {
         let _scene = new THREE.Scene();
@@ -43,7 +43,7 @@ define((require, exports, module) => {
         return _renderer;
     };
 
-    const _create_sphere = (params) => {
+    const _create_object = (params) => {
         let _geometry = new THREE.SphereGeometry(params.radius, 64, 64);
         let _material = new THREE.MeshStandardMaterial({
             color: params.color,
@@ -51,26 +51,34 @@ define((require, exports, module) => {
             roughness: 0.1,
             metalness: 0.3
         });
+
         let _sphere = new THREE.Mesh(_geometry, _material);
-        let [px, py, pz] = params.p;
-        _sphere.position.set(px, py, pz);
-        let _object = new Object(px, py, pz);
+        _sphere.position.set(...params.p);
+
+        let _object = new Object(...params.p);
         _object.mass = params.mass;
         _object.radius = params.radius;
 		_object.color = params.color;
 
         if ( params.v ) {
-	        let [vx, vy, vz] = params.v;
-	        _object.v = new Vector(vx, vy, vz);
+	        _object.v = new Vector(...params.v);
         }
 		
 		if ( params.a ) {
-			let [ax, ay, az] = params.a;
-			_object.a = new Vector(ax, ay, az);
+			_object.a = new Vector(...params.a);
 		}
 
         _sphere.object = _object;
         return _sphere;
+    };
+
+    const _create_objects = (a = []) => {
+    	let _result = [];
+    	a.forEach(c => {
+		    let _obj = _create_object(c);
+		    _result.push(_obj);
+	    });
+    	return _result;
     };
 
 	const _next_position = (o, interval) => {
@@ -84,10 +92,30 @@ define((require, exports, module) => {
         _scene: undefined,
         _aid: undefined,
         _config: {},
-
-        _rotating: false,
         
         _objs: [],
+
+	    _gravity_to(one, ...others) {
+		    let self = this;
+		    const G = self._config.G;
+		    let _v = others.reduce((v, o) => {
+			    let _d = o.p.add(one.p.minus());
+			    let _dl = _d.length;
+			    let _f = G * one.mass * o.mass / (_dl * _dl);
+			    v.append(Vector.of(_f, _d));
+			    return v;
+		    }, Vector.zero(3));
+		    return _v;
+	    },
+
+	    _add_line(start, end, material) {
+		    let self = this;
+		    let geometry = new THREE.Geometry();
+		    geometry.vertices.push(start);
+		    geometry.vertices.push(end);
+		    let line = new THREE.Line(geometry, material);
+		    self._scene.add(line);
+	    },
 
         _step() {
             let self = this;
@@ -106,6 +134,8 @@ define((require, exports, module) => {
 		            let [px, py, pz] = o.p.values;
 		            let [vx, vy, vz] = o.v.values;
 
+		            let _hit = false;
+
 		            if ( (px >= xmax - o.radius && vx > 0)
 			            || (px <= xmin + o.radius && vx < 0) ) {
 			            o.v.change([
@@ -113,6 +143,7 @@ define((require, exports, module) => {
 				            0, 1, 0,
 				            0, 0, 1
 			            ]);
+			            _hit = true;
 		            }
 
 		            if ( (py >= ymax - o.radius && vy > 0)
@@ -122,6 +153,7 @@ define((require, exports, module) => {
 				            0, -1, 0,
 				            0, 0, 1
 			            ]);
+			            _hit = true;
 		            }
 
 		            if ( (pz >= zmax - o.radius && vz > 0)
@@ -131,6 +163,11 @@ define((require, exports, module) => {
 				            0, 1, 0,
 				            0, 0, -1
 			            ]);
+			            _hit = true;
+		            }
+
+		            if ( _hit ) {
+		            	o.v.scale(0.9);
 		            }
 	            }
 
@@ -142,7 +179,7 @@ define((require, exports, module) => {
 	            }, []);
 
 	            if ( _config.gravity ) {
-		            let _f = o.gravityTo(..._others);
+		            let _f = self._gravity_to(o, ..._others);
 		            o.a = _f.scale(1.0 / o.mass);
 	            }
 
@@ -188,7 +225,11 @@ define((require, exports, module) => {
 	        self._renderer.render(self._scene, self._camera);
         },
         
-        init(config) {
+        init(config = {
+	        G: 5e+3,
+	        interval: 1,
+        	gravity: false
+        }) {
             let self = this;
             self._config = config;
             let _canvas = config.canvas;
@@ -210,21 +251,52 @@ define((require, exports, module) => {
 
         reset() {
             let self = this;
+            let _config = self._config;
 
             self.stop();
             self._theta = 0;
-	        self._camera.position.set(...self._config.camera.p);
+	        self._camera.position.set(..._config.camera.p);
 	        self._camera.lookAt(0, 0, 0);
 
 	        self._renderer.clear();
 	        self._scene.remove(...self._objs);
 	        self._objs.length = 0;
-	        let _objs = self._config.objs || [];
+	        let _objs = _create_objects(self._config.objs);
+	        self._objs.push(..._objs);
 	        _objs.forEach(c => {
-		        let _sphere = _create_sphere(c);
-		        self._objs.push(_sphere);
-		        self._scene.add(_sphere);
+		        self._scene.add(c);
 	        });
+
+	        if ( _config.box ) {
+		        let [xmin, xmax] = _config.box.x;
+		        let [ymin, ymax] = _config.box.y;
+		        let [zmin, zmax] = _config.box.z;
+
+		        let material = new THREE.LineBasicMaterial({ color: 0x222222 });
+
+		        let _v1 = new THREE.Vector3(xmax, ymin, zmax);
+		        let _v2 = new THREE.Vector3(xmax, ymax, zmax);
+		        let _v3 = new THREE.Vector3(xmin, ymax, zmax);
+		        let _v4 = new THREE.Vector3(xmin, ymin, zmax);
+		        let _v5 = new THREE.Vector3(xmax, ymin, zmin);
+		        let _v6 = new THREE.Vector3(xmax, ymax, zmin);
+		        let _v7 = new THREE.Vector3(xmin, ymax, zmin);
+		        let _v8 = new THREE.Vector3(xmin, ymin, zmin);
+
+		        self._add_line(_v1, _v2, material);
+		        self._add_line(_v3, _v4, material);
+		        self._add_line(_v5, _v6, material);
+		        self._add_line(_v7, _v8, material);
+		        self._add_line(_v1, _v5, material);
+		        self._add_line(_v2, _v6, material);
+		        self._add_line(_v3, _v7, material);
+		        self._add_line(_v4, _v8, material);
+		        self._add_line(_v1, _v4, material);
+		        self._add_line(_v2, _v3, material);
+		        self._add_line(_v5, _v8, material);
+		        self._add_line(_v7, _v6, material);
+	        }
+
 	        self._renderer.render(self._scene, self._camera);
         },
         

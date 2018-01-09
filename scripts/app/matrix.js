@@ -163,6 +163,12 @@ define(require => {
 			return self._values.filter((x, i) => i % self._cols === n);
 		}
 
+		/**
+		 * Multiply this matrix with a scalar, and return the result.
+		 *
+		 * @param s
+		 * @returns {Matrix}
+		 */
 		scale(s) {
 			let self = this;
 			let _array = Array.from(self._values, x => x * s);

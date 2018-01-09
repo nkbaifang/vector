@@ -1,62 +1,73 @@
 define(require => {
     'use strict';
-    
-    const {Vector, Object} = require('2d');
-    const GLOBAL = require('global');
-    
-    const _next_position = (o, interval) => {
-        let _np = o.p.add(o.v.scale(interval));
-        return _np;
+
+	const GLOBAL = require('global');
+    const Vector = require('vector');
+    const {Object} = require('2d');
+
+    const _create_object = (params) => {
+	    let _object = new Object(...params.p);
+	    _object.mass = params.mass;
+	    _object.radius = params.radius;
+	    _object.color = params.color;
+
+	    if ( params.v ) {
+		    _object.v = new Vector(...params.v);
+	    }
+
+	    if ( params.a ) {
+		    _object.a = new Vector(...params.a);
+	    }
+
+	    return _object;
     };
     
     const _create_objects = (a = []) => {
         let _result = [];
         a.forEach(c => {
-            let o = new Object(c.p[0], c.p[1]);
-            if ( c.v ) {
-                o.v = new Vector(c.v[0], c.v[1]);
-            }
-            if ( c.a ) {
-                o.a = new Vector(c.a[0], c.a[1]);
-            }
-            o.mass = c.mass;
-            o.radius = c.radius;
-            o.color = c.color;
+	        let _obj = _create_object(c);
     
-            _result.push(o);
+            _result.push(_obj);
         });
         return _result;
     };
+
+	const _next_position = (o, interval) => {
+		return o.p.add(o.v.scale(interval));
+	};
     
     const _module = {
         
         _width: undefined,
         _height: undefined,
         _ctx: undefined,
-        _id: undefined,
-        
-        _gravity: false,
-        
-        _interval: undefined,
+        _aid: undefined,
+
         _config: {},
         _objs: [],
+
+	    _gravity_to(one, ...others) {
+            let self = this;
+            const G = self._config.G;
+		    let _v = others.reduce((v, o) => {
+			    let _d = o.p.add(one.p.minus());
+			    let _dl = _d.length;
+			    let _f = G * one.mass * o.mass / (_dl * _dl);
+			    v.append(Vector.of(_f, _d));
+			    return v;
+		    }, Vector.zero(2));
+
+		    return _v;
+	    },
         
         _clear() {
             let self = this;
             self._ctx.clearRect(0, 0, self._width, self._height);
         },
         
-        _draw() {
-            let self = this;
-            
-            self._clear();
-            self._objs.forEach(o => {
-                o.draw(self._ctx);
-            });
-        },
-        
         _step() {
             let self = this;
+            let _config = self._config;
 
             self._objs.forEach(o => {
                 
@@ -81,8 +92,9 @@ define(require => {
                 
                 let _others = self._objs.filter(a => a !== o);
                 
-                if ( self._gravity ) {
-                    let _f = o.gravityTo(..._others);
+                if ( _config.gravity ) {
+                    let _f = self._gravity_to(o, ..._others);
+                //    let _f = o.gravityTo(..._others);
                     o.a = _f.scale(1.0 / o.mass);
                 }
                 
@@ -93,8 +105,8 @@ define(require => {
                     let _dpl = _dp.length;
                     if ( _dpl < o.radius + b.radius ) {
                         
-                        let _np1 = _next_position(o, self._interval);
-                        let _np2 = _next_position(b, self._interval);
+                        let _np1 = _next_position(o, _config.interval);
+                        let _np2 = _next_position(b, _config.interval);
                         if ( _np1.add(_np2.minus()).length < _dpl ) {
                             
                             let _sd = _dpl * _dpl;
@@ -113,24 +125,34 @@ define(require => {
             });
             
             self._objs.forEach(o => {
-                o.move(self._interval);
+                o.move(_config.interval);
             });
         },
+
+	    _draw() {
+		    let self = this;
+
+		    self._clear();
+		    self._objs.forEach(o => {
+			    o.draw(self._ctx);
+		    });
+	    },
         
-        init(params) {
+        init(config = {
+            G: 5e+3,
+            interval: 1,
+            gravity: false
+        }) {
             let self = this;
-            self._config = params;
-            self._gravity = !!self._config.gravity;
+            self._config = config;
             
-            let canvas = params.canvas;
-            let _ctx = canvas.getContext("2d");
+            let _canvas = config.canvas;
+            let _ctx = _canvas.getContext("2d");
             _ctx.fillStyle = 'rgb(0, 0, 0)';
             
-            self._interval = params.interval || 0.1;
-            
             self._ctx = _ctx;
-            self._width = canvas.width;
-            self._height = canvas.height;
+            self._width = _canvas.width;
+            self._height = _canvas.height;
             
             self.reset();
             
@@ -152,15 +174,15 @@ define(require => {
             let _animation_step = function () {
                 self._step();
                 self._draw();
-                self._id = GLOBAL.requestAnimationFrame(_animation_step);
+                self._aid = GLOBAL.requestAnimationFrame(_animation_step);
             };
             
-            self._id = GLOBAL.requestAnimationFrame(_animation_step);
+            self._aid = GLOBAL.requestAnimationFrame(_animation_step);
         },
         
         stop() {
             let self = this;
-            GLOBAL.cancelAnimationFrame(self._id);
+            GLOBAL.cancelAnimationFrame(self._aid);
         }
     };
     

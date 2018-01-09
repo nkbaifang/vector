@@ -75,6 +75,14 @@ define(require => {
 		}
 
 		/**
+		 * The direction of this vector.
+		 */
+		get dir() {
+			let self = this;
+			return Vector.of(self.length, self);
+		}
+
+		/**
 		 *
 		 * @returns {String}
 		 */
@@ -141,6 +149,19 @@ define(require => {
 		}
 
 		/**
+		 * Expand this vector to a higher dimension by adding extra components. This function does not change this
+		 * vector, it just returns a new vector.
+		 *
+		 * @param ns
+		 * @returns {Vector}
+		 */
+		expand(...ns) {
+			let self = this;
+			let _dim = [...self._dim, ...ns];
+			return new Vector(_dim);
+		}
+
+		/**
 		 * Reverse this vector.
 		 *
 		 * @returns {Vector}
@@ -160,6 +181,16 @@ define(require => {
 		 */
 		get values() {
 			return Array.from(this._dim, x => x);
+		}
+
+		/**
+		 * Set the components of this vector.
+		 *
+		 * @param values
+		 */
+		set(...values) {
+			let self = this;
+			self._dim = Array.from(values);
 		}
 
 		/**

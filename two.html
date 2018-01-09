@@ -9,7 +9,7 @@
 <body>
 	<canvas id="main" width="800" height="800"></canvas>
 	<div>
-		<div class="button" id="btn-start" data-running="false">Start</div>
+		<div class="button button-toggle" id="btn-start">Start</div>
 		<div class="button" id="btn-reset">Reset</div>
 	</div>
 	<script type="text/javascript">
@@ -33,7 +33,7 @@
 					let _r = _random_int(0, 256);
 					let _g = _random_int(0, 256);
 					let _b = _random_int(0, 256);
-					return 'rgb(' + _r + ', ' + _g + ', ' + _b + ')';
+					return `rgb(${_r}, ${_g}, ${_b})`;
 				};
 
 				let _create_random_objects = (count) => {
@@ -51,31 +51,40 @@
 					}
 					return array;
 				};
-				
-				let _btn_start = $('#btn-start');
-				
-				_btn_start.click(() => {
-					let _running = _btn_start.attr('data-running');
-					if ( _running !== 'true' ) {
+
+				$('.button-toggle').click(() => {
+					let _btn = $(event.target);
+					_btn.toggleClass('pressed');
+				});
+
+				$('#btn-start').click(() => {
+					let _btn = $(event.target);
+					if ( _btn.hasClass('pressed') ) {
 						M.start();
-						_btn_start.attr('data-running', 'true').text('Stop');
+						_btn.text('Stop');
 					} else {
 						M.stop();
-						_btn_start.attr('data-running', 'false').text('Start');
+						_btn.text('Start');
 					}
 				});
 				
 				$('#btn-reset').click(() => {
 					M.stop();
 					M.reset();
-					_btn_start.attr('data-running', 'false').text('Start');
+					$('#btn-start').removeClass('pressed').text('Start');
 				});
 				
 				M.init({
 					canvas: $('#main')[0],
 					objs: _create_random_objects(10),
 					interval: 0.1,
-					gravity: false
+					gravity: true,
+					G: 5e+2,
+					transform: [
+						1, 0,
+						0, 1,
+						0, 0
+					]
 				});
 			});
 		});

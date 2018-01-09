@@ -4,32 +4,13 @@ define(require => {
 	
 	let Vector = require('vector');
 	
-	class Vector3D extends Vector {
-		
-		constructor(x = 0, y = 0, z = 0) {
-			super(x, y, z);
-		}
-		
-		get x() {
-			return this._dim[0];
-		}
-		
-		get y() {
-			return this._dim[1];
-		}
-		
-		get z() {
-			return this._dim[2];
-		}
-	}
-	
 	class Point3D {
 		
-		constructor([x = 0, y = 0, z = 0] = [], [vx = 0, vy = 0, vz = 0] = [], [ax = 0, ay = 0, az = 0] = []) {
+		constructor(x = 0, y = 0, z = 0) {
 			let self = this;
-			self._p = new Vector3D(x, y, z);
-			self._v = new Vector3D(vx, vy, vz);
-			self._a = new Vector3D(ax, ay, az);
+			self._p = new Vector(x, y, z);
+			self._v = new Vector(0, 0, 0);
+			self._a = new Vector(0, 0, 0);
 		}
 		
 		get p() {
@@ -74,15 +55,11 @@ define(require => {
 		}
 	}
 	
-	const ROUND = 2 * Math.PI;
-	
 	class Sphere3D extends Point3D {
 		
-		constructor(x, y, z, r = 1, c = 'rgb(0, 0, 0)') {
-			super([x, y, z]);
+		constructor(x, y, z, r = 1) {
+			super(x, y, z);
 			this._radius = r;
-			this._solid = true;
-			this._color = c;
 		}
 		
 		get radius() {
@@ -100,17 +77,7 @@ define(require => {
 		set color(c) {
 			this._color = c;
 		}
-		
-		get solid() {
-			return this._solid;
-		}
-		
-		set solid(s) {
-			this._solid = s;
-		}
 	}
-	
-	const G = 5e+3;
 	
 	class Object3D extends Sphere3D {
 		
@@ -152,25 +119,10 @@ define(require => {
 		get energy() {
 			return 0.5 * this.mass * this.v.dot(this.v);
 		}
-		
-		gravityTo(...objs) {
-			let self = this;
-			
-			let _v = objs.reduce((v, o) => {
-				let _d = o.p.add(self.p.minus());
-				let _dl = _d.length;
-				let _f = G * self.mass * o.mass / (_dl * _dl);
-				v.append(Vector.of(_f, _d));
-				return v;
-			}, Vector.zero(3));
-			
-			return _v;
-		}
 	}
 	
 	return {
 		Point: Point3D,
-		Vector: Vector3D,
 		Sphere: Sphere3D,
 		Object: Object3D
 	};
