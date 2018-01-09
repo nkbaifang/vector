@@ -73,16 +73,30 @@
 					M.reset();
 					$('#btn-start').removeClass('pressed').text('Start');
 				});
+
+				let _objs = [{
+				    mass: 1.9891e+33,
+					radius: 6.96265e+8,
+					p: [0, 0],
+					v: [0, 0]
+				}, {
+                    mass: 5.9742e+24,
+                    radius: 12756.1 / 2,
+                    p: [1.4966918e+11, 0],
+                    v: [0, 0]
+				}];
+
+				let _scale = 300 / 1.4966918e+11;
 				
 				M.init({
 					canvas: $('#main')[0],
-					objs: _create_random_objects(10),
+					objs: _objs,
 					interval: 0.1,
 					gravity: true,
 					G: 5e+2,
 					transform: [
-						1, 0,
-						0, 1,
+                        _scale, 0,
+						0, -_scale,
 						0, 0
 					]
 				});
