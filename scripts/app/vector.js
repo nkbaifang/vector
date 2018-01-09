@@ -12,6 +12,8 @@ define(require => {
 		 * Construct a new Vector object.
 		 *
 		 * @args Array|Number
+		 *     new Vector(3, 4, 5) or
+		 *     new Vector([3, 4, 5])
 		 */
 		constructor(...args) {
 			this._dim = Array.from(args.length > 1 ? args : args[0]);
@@ -37,7 +39,7 @@ define(require => {
 		/**
 		 * Create a zero vector of n dimensions.
 		 *
-		 * @param Number
+		 * @param Number n
 		 * @returns {Vector}
 		 */
 		static zero(n) {

@@ -4,7 +4,7 @@ define(require => {
 	const GLOBAL = require('global');
     const THREE = require('three');
     const Vector = require('vector');
-    const {Object} = require('3d');
+    const Object = require('object');
     
     const _create_scene = () => {
         let _scene = new THREE.Scene();
@@ -55,7 +55,8 @@ define(require => {
         let _sphere = new THREE.Mesh(_geometry, _material);
         _sphere.position.set(...params.p);
 
-        let _object = new Object(...params.p);
+        let _object = Object.of(params);
+        /*
         _object.mass = params.mass;
         _object.radius = params.radius;
 		_object.color = params.color;
@@ -67,6 +68,7 @@ define(require => {
 		if ( params.a ) {
 			_object.a = new Vector(...params.a);
 		}
+		*/
 
         _sphere.object = _object;
         return _sphere;

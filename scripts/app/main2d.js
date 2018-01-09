@@ -3,30 +3,14 @@ define(require => {
 
 	const GLOBAL = require('global');
     const Vector = require('vector');
-    const {Object} = require('2d');
-
-    const _create_object = (params) => {
-	    let _object = new Object(...params.p);
-	    _object.mass = params.mass;
-	    _object.radius = params.radius;
-	    _object.color = params.color;
-
-	    if ( params.v ) {
-		    _object.v = new Vector(...params.v);
-	    }
-
-	    if ( params.a ) {
-		    _object.a = new Vector(...params.a);
-	    }
-
-	    return _object;
-    };
+    const Object = require('object');
+    
+    const ROUND = 2 * Math.PI;
     
     const _create_objects = (a = []) => {
         let _result = [];
         a.forEach(c => {
-	        let _obj = _create_object(c);
-    
+	        let _obj = Object.of(c);
             _result.push(_obj);
         });
         return _result;
@@ -131,10 +115,15 @@ define(require => {
 
 	    _draw() {
 		    let self = this;
-
+            let _ctx = self._ctx;
 		    self._clear();
 		    self._objs.forEach(o => {
-			    o.draw(self._ctx);
+                _ctx.fillStyle = o.color;
+                _ctx.beginPath();
+                let [x, y] = o.p.values;
+                _ctx.arc(x, y, o.radius, 0, ROUND);
+                _ctx.closePath();
+                _ctx.fill();
 		    });
 	    },
         

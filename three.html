@@ -59,29 +59,20 @@
                 T.rotate(_btn.hasClass('pressed'));
             });
 
-            const velocity = 10;
-            const mass = 10;
-
             let _objs = [{
-                radius: 10,
-                mass: mass,
-                color: 'rgb(0, 255, 0)',
-                p: [10, -100, -100],
-                v: [0, 0, -velocity]
+                radius: 50,
+                mass: 130,
+                color: 'rgb(239, 196, 52)',
+                p: [0, 0, 0],
+                v: [0, 0, 0],
             //	a: [0, 0, -2]
+                fixed: true
             }, {
                 radius: 10,
-                mass: mass,
-                color: 'rgb(255, 255, 0)',
-                p: [0, -90, 100],
-                v: [0, 0, velocity]
-            //	a: [0, 0, -2]
-            }, , {
-                radius: 10,
-                mass: mass,
-                color: 'rgb(0, 255, 255)',
-                p: [30, 90, 0],
-                v: [-velocity, 0, -3]
+                mass: 10,
+                color: 'rgb(0, 255, 140)',
+                p: [0, 200, 0],
+                v: [0, 0, 50]
             //	a: [0, 0, -2]
             }];
             T.init({
@@ -91,11 +82,13 @@
                     angle: 65
                 },
                 objs: _objs,
-            /*  box: {
+                /*
+                box: {
                     x: [-200, 200],
                     y: [-200, 200],
                     z: [-200, 200]
-                }, */
+                },
+                */
                 interval: 0.1,
                 gravity: true,
                 G: 5e+3
