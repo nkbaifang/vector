@@ -150,10 +150,11 @@ define(require => {
 			            _hit = true;
 		            }
 
-		            if ( _hit ) {
+		            if ( _hit && !_config.elastic ) {
 		            	o.v.change([
-		            		0.9, 0,
-				            0, 0.9
+		            		0.9, 0, 0,
+				            0, 0.9, 0,
+				            0, 0, 0.9
 			            ]);
 		            }
 	            }
@@ -215,6 +216,7 @@ define(require => {
         init(config = {
 	        G: 5e+3,
 	        interval: 1,
+            elastic: true,
         	gravity: false
         }) {
             let self = this;

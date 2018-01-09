@@ -243,8 +243,9 @@ define(require => {
 		 */
 		change(m) {
 			let self = this;
-			if ( self.dim * self.dim !== m.length ) {
-				throw new Error("Invalid parameters.");
+			
+			if ( m instanceof Array && self.dim * self.dim !== m.length) {
+                throw new Error("Invalid parameters.");
 			}
 
 			let m1 = new Matrix(1, self.dim, self._dim);
