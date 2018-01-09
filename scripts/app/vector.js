@@ -2,44 +2,42 @@ define(require => {
 	'use strict';
 
 	const Matrix = require('matrix');
+	
+	const _assert = (...vs) => {
+        if ( vs.length <= 1 ) {
+            return;
+        }
+        let [_first, ..._others] = vs;
+        let _b = _others.every((v) => v.dim === _first.dim);
+        if ( !_b ) {
+            throw new Error('vectors in different dimensions');
+        }
+	};
 
 	/**
 	 * Vector class
 	 */
 	class Vector {
-
-		/**
-		 * Construct a new Vector object.
-		 *
-		 * @args Array|Number
-		 *     new Vector(3, 4, 5) or
-		 *     new Vector([3, 4, 5])
-		 */
+        
+        /**
+         * Construct a new Vector object. The constructor function can be invoked in two forms.<br/>
+         *      &nbsp;&nbsp;&nbsp;<code>new Vector(3, 4, 5)</code><br/>
+         * or<br/>
+         *      &nbsp;&nbsp;&nbsp;<code>new Vector([3, 4, 5])</code><br/>
+         *
+         * @param {Array|Number} args
+         *      Vector components
+         */
 		constructor(...args) {
 			this._dim = Array.from(args.length > 1 ? args : args[0]);
 		}
 
 		/**
-		 * Verify demensions of vectors.
-		 *
-		 * @param vs Vectors
-		 * @private
-		 */
-		static _assert(...vs) {
-			if ( vs.length <= 1 ) {
-				return;
-			}
-			let [_first, ..._others] = vs;
-			let _b = _others.every((v) => v.dim === _first.dim);
-			if ( !_b ) {
-				throw new Error('vectors in different dimensions');
-			}
-		}
-
-		/**
 		 * Create a zero vector of n dimensions.
 		 *
-		 * @param Number n
+		 * @param {Number} n
+		 *      Dimension of new vector.
+		 *
 		 * @returns {Vector}
 		 */
 		static zero(n) {
@@ -49,8 +47,12 @@ define(require => {
 		/**
 		 * Create a new vector by length and direction.
 		 *
-		 * @param len
-		 * @param v
+		 * @param {Number} len
+		 *      Length of new vector.
+		 *
+		 * @param {Vector} v
+		 *      Direction of new vector.
+		 *
 		 * @returns {Vector}
 		 */
 		static of(len, v) {
@@ -116,13 +118,15 @@ define(require => {
 		 * Return the addition of this and other vectors. This function does not change this vector,
 		 * it just returns a new Vector.
 		 *
-		 * @param vs
+		 * @param {Vector} vs
+		 *      Other vectors
+		 *
 		 * @returns {Vector}
 		 */
 		add(...vs) {
 			let self = this;
 			let _av = [...vs, self];
-			Vector._assert(..._av);
+			_assert(..._av);
 
 			let _t = _av.reduce((a, v) => [...a, ...v._dim], []);
 			let _r = _t.reduce((r, a, i) => {
@@ -135,12 +139,14 @@ define(require => {
 		/**
 		 * Add other vectors to this vector.
 		 *
-		 * @param vs
+		 * @param {Vector} vs
+		 *      Other vectors
+		 *
 		 * @returns {Vector} this
 		 */
 		append(...vs) {
 			let self = this;
-			Vector._assert(...vs);
+			_assert(...vs);
 
 			let len = self._dim.length;
 			let _a = vs.reduce((a, v) => [...a, ...v._dim], []);
@@ -154,7 +160,9 @@ define(require => {
 		 * Expand this vector to a higher dimension by adding extra components. This function does not change this
 		 * vector, it just returns a new vector.
 		 *
-		 * @param ns
+		 * @param {Number} ns
+		 *      Additional components
+		 *
 		 * @returns {Vector}
 		 */
 		expand(...ns) {
@@ -179,7 +187,7 @@ define(require => {
 		/**
 		 * Return the components of this vector.
 		 *
-		 * @returns {Number[]}
+		 * @returns {Array}
 		 */
 		get values() {
 			return Array.from(this._dim, x => x);
@@ -188,7 +196,7 @@ define(require => {
 		/**
 		 * Set the components of this vector.
 		 *
-		 * @param values
+		 * @param {Number} values
 		 */
 		set(...values) {
 			let self = this;
@@ -207,7 +215,8 @@ define(require => {
 		/**
 		 * Multiply this vector with a scalar. This function does not change this vector, it just returns a new vector.
 		 *
-		 * @param s
+		 * @param {Number} s
+		 *
 		 * @returns {Vector}
 		 */
 		scale(s) {
@@ -217,17 +226,20 @@ define(require => {
 		/**
 		 * Return dot product of this vector and another one.
 		 *
-		 * @param v
+		 * @param {Vector} v
 		 */
 		dot(v) {
-			Vector._assert(this, v);
+			_assert(this, v);
 			return this._dim.reduce((s, x, i) => s + x * v._dim[i], 0);
 		}
 
 		/**
+		 * Change this vector by multipling another matrix.
 		 *
-		 * @param Array|Matrix m
-		 * @returns Vector this
+		 * @param {Array|Matrix} m
+		 *      Square matrix
+		 *
+		 * @returns {Vector} this
 		 */
 		change(m) {
 			let self = this;
@@ -240,6 +252,20 @@ define(require => {
 			let m3 = m1.multiply(m2);
 			self._dim = m3.row(0);
 			return self;
+		}
+        
+        /**
+         * Create a matrix.
+         *
+         * @param {Boolean} column
+         *      Whether the result is a column vector.
+         *
+         * @returns {Matrix}
+         */
+		matrix(column = false) {
+			let self = this;
+			let [_rows, _cols] = [column ? self.dim : 1, column ? 1 : self.dim];
+			return new Matrix(_rows, _cols, self._dim);
 		}
 	}
 

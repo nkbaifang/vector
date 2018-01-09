@@ -10,9 +10,14 @@ define(require => {
 		/**
 		 * Construct a new matrix object.
 		 *
-		 * @param rows  Number of rows
-		 * @param cols  Number of columns
-		 * @param array  An array contains the matrix data. Array length must be <code>rows</code> times <code>cols</code>.
+		 * @param {Number} rows
+		 *      Row count
+		 *
+		 * @param {Number} cols
+		 *      Column count
+		 *
+		 * @param {Array} array
+		 *      An array contains the matrix data. Array length must be <code>rows</code> times <code>cols</code>.
 		 */
 		constructor(rows = 0, cols = 0, array = []) {
 			let self = this;
@@ -28,7 +33,9 @@ define(require => {
 		/**
 		 * Create a square matrix with data.
 		 *
-		 * @param array  An array contains the matrix data, and the length must be a square number.
+		 * @param {Array} array
+		 *      An array contains the matrix data, and the length must be a square number.
+		 *
 		 * @returns {Matrix}
 		 */
 		static square(array = []) {
@@ -38,33 +45,48 @@ define(require => {
 			}
 			return new Matrix(_rows, _rows, array);
 		}
-
-		/**
-		 * Create a matrix which items are all zero.
-		 *
-		 * @param rows
-		 * @param cols
-		 * @returns {Matrix}
-		 */
-		static zero(rows, cols) {
+        
+        /**
+         * Create a matrix which items are all zero.
+         *
+         * @param {Number} rows
+         *      Number of rows.
+         *
+         * @param {Number} cols
+         *      Number of columns.
+         *
+         * @param {*} zero
+         *      Zero element. Default value is numerical zero.
+         *
+         * @returns {Matrix}
+         */
+		static zero(rows, cols, zero = 0) {
 			if ( rows < 0 || cols < 0 ) {
 				throw new Error('Illegal arguments.');
 			}
-			return new Matrix(rows, cols, Array.from({length: rows * cols}, () => 0));
+			return new Matrix(rows, cols, Array.from({length: rows * cols}, () => zero));
 		}
-
-		/**
-		 * Create a identity matrix.
-		 *
-		 * @param n
-		 * @returns {Matrix}
-		 */
-		static identity(n) {
+        
+        /**
+         * Create a identity matrix.
+         *
+         * @param {Number} n
+         *      Both row and column count.
+         *
+         * @param {*} one
+         *      Identity element. Default value is numerical one.
+         *
+         * @param {*} zero
+         *      Zero element. Default value is numerical zero.
+         *
+         * @returns {Matrix}
+         */
+		static identity(n, one = 1, zero = 0) {
 			if ( n < 0  ) {
 				throw new Error('Illegal arguments.');
 			}
 			
-			return new Matrix(n, n, Array.from({length: n * n}, (x, i) => Math.floor(i / n) == i % n ? 1 : 0));
+			return new Matrix(n, n, Array.from({length: n * n}, (x, i) => Math.floor(i / n) === i % n ? one : zero));
 		}
 
 		/**
@@ -105,9 +127,13 @@ define(require => {
 		/**
 		 * Return the item value.
 		 *
-		 * @param i
-		 * @param j
-		 * @returns {Number}
+		 * @param {Number} i
+		 *      Row index
+		 *
+		 * @param {Number} j
+		 *      Column index
+		 *
+		 * @returns {*}
 		 */
 		getValue(i, j) {
 			let self = this;
@@ -120,9 +146,13 @@ define(require => {
 		/**
 		 * Change the item value.
 		 *
-		 * @param i
-		 * @param j
-		 * @param n {Number}
+		 * @param {Number} i
+		 *      Row index
+		 *
+		 * @param {Number} j
+		 *      Column index
+		 *
+		 * @param {*} n New value
 		 */
 		setValue(i, j, n) {
 			let self = this;
@@ -138,8 +168,10 @@ define(require => {
 		/**
 		 * Get one row of this matrix.
 		 *
-		 * @param n
-		 * @returns {Number[]}
+		 * @param {Number} n
+		 *      Row index
+		 *
+		 * @returns {Array}
 		 */
 		row(n) {
 			let self = this;
@@ -152,8 +184,10 @@ define(require => {
 		/**
 		 * Get one column of this matrix.
 		 *
-		 * @param n
-		 * @returns {Number[]}
+		 * @param {Number} n
+		 *      Column index
+		 *
+		 * @returns {Array}
 		 */
 		col(n) {
 			let self = this;
@@ -162,27 +196,38 @@ define(require => {
 			}
 			return self._values.filter((x, i) => i % self._cols === n);
 		}
-
-		/**
-		 * Multiply this matrix with a scalar, and return the result.
-		 *
-		 * @param s
-		 * @returns {Matrix}
-		 */
-		scale(s) {
+        
+        /**
+         * Multiply this matrix with a scalar, and return the result.
+         *
+         * @param {Number} s Scalar number
+         * @param {Function} multiply Multiplication function. Default is numerical multiplication.
+         * @returns {Matrix}
+         */
+		scale(s, multiply = (a, b) => a * b) {
 			let self = this;
-			let _array = Array.from(self._values, x => x * s);
+			let _array = Array.from(self._values, x => multiply(s, x));
 			return new Matrix(self.rows, self.cols, _array);
 		}
-
-		/**
-		 * Multiply this matrix with another. This function does not change this matrix, and it just returns the result.
-		 *
-		 * @param m
-		 * @param multiplication  Multiplication function.
-		 * @returns {Matrix}
-		 */
-		multiply(m, multiplication = (a, b) => a * b) {
+        
+        /**
+         * Multiply this matrix with another. This function does not change this matrix, and it just returns the result.
+         *
+         * @param {Matrix} m
+         *      Another matrix.
+         *
+         * @param {Function} multiply
+         *      Multiplication function. Default is numerical multiplication.
+         *
+         * @param {Function} add
+         *      Addition function. Default is numerical addition.
+         *
+         * @param {*} zero
+         *      Zero element. Default value is numerical zero.
+         *
+         * @returns {Matrix}
+         */
+		multiply(m, multiply = (a, b) => a * b, add = (a, b) => a + b, zero = 0) {
 			let self = this;
 			if ( self.cols !== m.rows ) {
 				throw new Error('Illegal matrix row: ' + m.rows);
@@ -190,29 +235,43 @@ define(require => {
 			
 			let a = [];
 			
-			let i = 0;
-			while ( i < self.rows ) {
+			for ( let i = 0; i < self.rows; i++ ) {
 				
 				let n = self.cols;
-				let j = 0;
-				while ( j < m.cols ) {
+				for ( let j = 0; j < m.cols; j++ ) {
 					
-					let p = 0;
-					let r = 0;
-					while ( r < n ) {
-						p += multiplication(self.getValue(i, r), m.getValue(r, j)); // self.getValue(i, r) * m.getValue(r, j);
-						r++;
+					let p = zero;
+					for ( let k = 0; k < n; k++ ) {
+						let x = multiply(self.getValue(i, k), m.getValue(k, j));
+						p = add(p, x);
 					}
 					a.push(p);
-					
-					j++;
 				}
-				
-				i++;
 			}
 			
 			return new Matrix(self.rows, m.cols, a);
 		}
+        
+        /**
+         * Return the transpose matrix.
+         *
+         * @returns {Matrix}
+         */
+        transpose() {
+			let self = this;
+			
+			let _array = Array.from(self._values);
+			
+			self._values.forEach((n, i) => {
+				let _i = Math.floor(i / self._cols);
+				let _j = i % self._cols;
+				
+				// [i * self._cols + j]
+				_array[_j * self._rows + _i] = n;
+			});
+			
+			return new Matrix(self._cols, self._rows, _array);
+        }
 	}
 	
 	return Matrix;
