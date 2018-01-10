@@ -75,7 +75,7 @@ define(require => {
 		 * @returns {Number}
 		 */
 		get length() {
-			return Math.sqrt(this._dim.reduce((s, v) => s + v * v, 0));
+			return Math.hypot(...this._dim);
 		}
 
 		/**
@@ -234,14 +234,14 @@ define(require => {
 		}
 
 		/**
-		 * Change this vector by multipling another matrix.
-		 *
+		 * Multiplies this vector by a matrix.
+         *
 		 * @param {Array|Matrix} m
 		 *      Square matrix
 		 *
 		 * @returns {Vector} this
 		 */
-		change(m) {
+		apply(m) {
 			let self = this;
 			
 			if ( m instanceof Array && self.dim * self.dim !== m.length) {
