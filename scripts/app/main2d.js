@@ -61,7 +61,7 @@ define(require => {
     
                     if ( (px >= xmax - o.radius && vx > 0)
                         || (px <= xmin + o.radius && vx < 0) ) {
-                        o.v.change([
+                        o.v.apply([
                             -1, 0,
                             0, 1
                         ]);
@@ -69,7 +69,7 @@ define(require => {
     
                     if ( (py >= ymax - o.radius && vy > 0)
                         || (py <= ymin + o.radius && vy < 0) ) {
-                        o.v.change([
+                        o.v.apply([
                             1, 0,
                             0, -1
                         ]);
@@ -125,7 +125,7 @@ define(require => {
                 let _radius = o.radius;
                 
                 if ( self._tm ) {
-                    let _p = o.p.expand(1).change(self._tm);
+                    let _p = o.p.expand(1).apply(self._tm);
                     [x, y] = _p.values;
                     _radius = Math.ceil(_radius * self._tm.getValue(0, 0));
                     if ( _radius < 1 ) {
