@@ -174,7 +174,7 @@ define(require => {
         start() {
             let self = this;
             
-            let _animation_step = function () {
+            let _animation_step = () => {
                 self._step();
                 self._draw();
                 self._aid = GLOBAL.requestAnimationFrame(_animation_step);
