@@ -22,7 +22,7 @@
 		});
 		
 		require(['jquery', 'main2d'], ($, M) => {
-		
+
 			$(() => {
 
 				let _random_int = (min, max) => {
@@ -75,29 +75,46 @@
 				});
 
 				let _objs = [{
-				    mass: 1.9891e+33,
-					radius: 6.96265e+8,
+				    mass: 1.9891e+30,
+					radius: 6.955e+8,
+					color: 'rgb(255, 0, 0)',
 					p: [0, 0],
 					v: [0, 0]
 				}, {
-                    mass: 5.9742e+24,
-                    radius: 12756.1 / 2,
-                    p: [1.4966918e+11, 0],
-                    v: [0, 0]
-				}];
+                    mass: 5.965e+24,
+                    radius: 6.378e+6,
+                    color: 'rgb(0, 0, 255)',
+                    p: [1.47e+11, 0],
+                    v: [0, 30287]
+				}, {
+                    mass: 4.869e+24,
+                    radius: 6.0518e+6,
+                    color: 'rgb(255, 255, 0)',
+                    p: [1.082e+11, 0],
+                    v: [0, 35030]
+                }];
+
+				let _canvas = $('#main')[0];
 
 				let _scale = 300 / 1.4966918e+11;
 				
 				M.init({
-					canvas: $('#main')[0],
+					canvas: {
+						dom: _canvas,
+						background: 'rgb(40, 40, 40)'
+					},
 					objs: _objs,
-					interval: 0.1,
+					interval: 7200,
+				/*	box: {
+					    x: [-_canvas.width / 2, _canvas.width / 2],
+						y: [-_canvas.height / 2, _canvas.height / 2]
+					}, */
 					gravity: true,
-					G: 5e+2,
+					G: 6.67408e-11,
 					transform: [
                         _scale, 0,
 						0, -_scale,
-						0, 0
+                        _canvas.width / 2, _canvas.height / 2
 					]
 				});
 			});

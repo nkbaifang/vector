@@ -4,16 +4,12 @@ define(require => {
 	const GLOBAL = require('global');
     const Vector = require('vector');
     const Object = require('object');
+    const Matrix = require('matrix');
     
     const ROUND = 2 * Math.PI;
     
     const _create_objects = (a = []) => {
-        let _result = [];
-        a.forEach(c => {
-	        let _obj = Object.of(c);
-            _result.push(_obj);
-        });
-        return _result;
+        return a.reduce((s, c) => [...s, Object.of(c)], []);
     };
 
 	const _next_position = (o, interval) => {
@@ -22,31 +18,31 @@ define(require => {
     
     const _module = {
         
-        _width: undefined,
-        _height: undefined,
         _ctx: undefined,
         _aid: undefined,
 
         _config: {},
+        _tm: undefined,
         _objs: [],
 
 	    _gravity_to(one, ...others) {
             let self = this;
             const G = self._config.G;
-		    let _v = others.reduce((v, o) => {
+		    return others.reduce((v, o) => {
 			    let _d = o.p.add(one.p.minus());
 			    let _dl = _d.length;
 			    let _f = G * one.mass * o.mass / (_dl * _dl);
 			    v.append(Vector.of(_f, _d));
 			    return v;
 		    }, Vector.zero(2));
-
-		    return _v;
 	    },
         
         _clear() {
             let self = this;
-            self._ctx.clearRect(0, 0, self._width, self._height);
+            let _canvas = self._config.canvas.dom;
+            self._ctx.fillStyle = self._config.canvas.background;
+            self._ctx.clearRect(0, 0, _canvas.width, _canvas.height);
+            self._ctx.fillRect(0, 0, _canvas.width, _canvas.height);
         },
         
         _step() {
@@ -55,30 +51,35 @@ define(require => {
 
             self._objs.forEach(o => {
                 
-                let [px, py] = o.p.values;
-                let [vx, vy] = o.v.values;
-                
-                if ( (py >= self._height - o.radius && vy > 0)
-                    || (py <= o.radius && vy < 0) ) {
-                    o.v.change([
-                        1, 0,
-                        0, -1
-                    ]);
-                }
-                
-                if ( (px >= self._width - o.radius && vx > 0)
-                    || (px <= o.radius && vx < 0) ) {
-                    o.v.change([
-                        -1, 0,
-                        0, 1
-                    ]);
+                if ( _config.box ) {
+                    
+                    let [xmin, xmax] = _config.box.x;
+                    let [ymin, ymax] = _config.box.y;
+                    
+                    let [px, py] = o.p.values;
+                    let [vx, vy] = o.v.values;
+    
+                    if ( (px >= xmax - o.radius && vx > 0)
+                        || (px <= xmin + o.radius && vx < 0) ) {
+                        o.v.change([
+                            -1, 0,
+                            0, 1
+                        ]);
+                    }
+    
+                    if ( (py >= ymax - o.radius && vy > 0)
+                        || (py <= ymin + o.radius && vy < 0) ) {
+                        o.v.change([
+                            1, 0,
+                            0, -1
+                        ]);
+                    }
                 }
                 
                 let _others = self._objs.filter(a => a !== o);
                 
                 if ( _config.gravity ) {
                     let _f = self._gravity_to(o, ..._others);
-                //    let _f = o.gravityTo(..._others);
                     o.a = _f.scale(1.0 / o.mass);
                 }
                 
@@ -121,13 +122,26 @@ define(require => {
                 _ctx.fillStyle = o.color;
                 _ctx.beginPath();
                 let [x, y] = o.p.values;
-                _ctx.arc(x, y, o.radius, 0, ROUND);
+                let _radius = o.radius;
+                
+                if ( self._tm ) {
+                    let _p = o.p.expand(1).change(self._tm);
+                    [x, y] = _p.values;
+                    _radius = Math.ceil(_radius * self._tm.getValue(0, 0));
+                    if ( _radius < 1 ) {
+                        _radius = 1;
+                    }
+                    //console.log(`object: p=(${x}, ${y}), r=${_radius}`);
+                }
+                
+                _ctx.arc(x, y, _radius, 0, ROUND);
                 _ctx.closePath();
                 _ctx.fill();
 		    });
 	    },
         
         init(config = {
+            canvas: {},
             G: 5e+3,
             interval: 1,
             gravity: false
@@ -135,13 +149,13 @@ define(require => {
             let self = this;
             self._config = config;
             
-            let _canvas = config.canvas;
-            let _ctx = _canvas.getContext("2d");
-            _ctx.fillStyle = 'rgb(0, 0, 0)';
+            if ( self._config.transform ) {
+                self._tm = new Matrix(3, 2, self._config.transform);
+            }
             
-            self._ctx = _ctx;
-            self._width = _canvas.width;
-            self._height = _canvas.height;
+            let _canvas = config.canvas.dom;
+            
+            self._ctx = _canvas.getContext("2d");
             
             self.reset();
             
