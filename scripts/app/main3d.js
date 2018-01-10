@@ -58,12 +58,7 @@ define(require => {
     };
 
     const _create_objects = (a = []) => {
-    	let _result = [];
-    	a.forEach(c => {
-		    let _obj = _create_object(c);
-		    _result.push(_obj);
-	    });
-    	return _result;
+    	return a.reduce((s, c) => [...s, _create_object(c)], []);
     };
 
 	const _next_position = (o, interval) => {
@@ -122,7 +117,7 @@ define(require => {
 
 		            if ( (px >= xmax - o.radius && vx > 0)
 			            || (px <= xmin + o.radius && vx < 0) ) {
-			            o.v.change([
+			            o.v.apply([
 				            -1, 0, 0,
 				            0, 1, 0,
 				            0, 0, 1
@@ -132,7 +127,7 @@ define(require => {
 
 		            if ( (py >= ymax - o.radius && vy > 0)
 			            || (py <= ymin + o.radius && vy < 0) ) {
-			            o.v.change([
+			            o.v.apply([
 				            1, 0, 0,
 				            0, -1, 0,
 				            0, 0, 1
@@ -142,7 +137,7 @@ define(require => {
 
 		            if ( (pz >= zmax - o.radius && vz > 0)
 			            || (pz <= zmin + o.radius && vz < 0) ) {
-			            o.v.change([
+			            o.v.apply([
 				            1, 0, 0,
 				            0, 1, 0,
 				            0, 0, -1
@@ -151,20 +146,15 @@ define(require => {
 		            }
 
 		            if ( _hit && !_config.elastic ) {
-		            	o.v.change([
+		            	o.v.apply([
 		            		0.9, 0, 0,
 				            0, 0.9, 0,
 				            0, 0, 0.9
 			            ]);
 		            }
 	            }
-
-	            let _others = self._objs.reduce((a, s) => {
-	                if ( s !== sphere ) {
-	                    a.push(s.object);
-		            }
-		            return a;
-	            }, []);
+	            
+				let _others = self._objs.reduce((a, s) => s === sphere ? [...a] : [...a, s.object], []);
 
 	            if ( _config.gravity ) {
 		            let _f = self._gravity_to(o, ..._others);
@@ -216,6 +206,7 @@ define(require => {
         init(config = {
 	        G: 5e+3,
 	        interval: 1,
+	        rotate: false,
             elastic: true,
         	gravity: false
         }) {
@@ -234,6 +225,45 @@ define(require => {
             self._renderer = _renderer;
             
             self.reset();
+            
+            if ( config.rotate ) {
+            	let [_cx, _cy] = [_canvas.width / 2, _canvas.height / 2];
+            	let [_sx, _sy] = [];
+            	//let [_dphi, _dtheta] = [Math.PI / _canvas.width, Math.PI / _canvas.height];
+	            
+	            const _HALF_PI = Math.PI / 2;
+            	
+                let _mouse_move = (event) => {
+                    
+                    let _phi = (_sx - event.clientX) * Math.PI / _canvas.width;
+                    let _theta = (_sy - event.clientY) * Math.PI / _canvas.height;
+    
+                    console.log(`moving: (${event.clientX}, ${event.clientY}), angle: (${_phi}, ${_theta})`);
+                    
+                    let _euler = new THREE.Euler(0, _theta, _phi, 'XYZ');
+                    self._camera.position.applyEuler(_euler);
+                    self._camera.lookAt(0, 0, 0);
+                    self._renderer.render(self._scene, self._camera);
+    
+                    [_sx, _sy] = [event.clientX, event.clientY];
+                };
+    
+                let _mouse_up = (event) => {
+                    _canvas.removeEventListener('mousemove', _mouse_move, false);
+                    _canvas.removeEventListener('mouseup', _mouse_up, false);
+                    _canvas.removeEventListener('mouseout', _mouse_up, false);
+                };
+            	
+            	let _mouse_down = (event) => {
+            		[_sx, _sy] = [event.clientX, event.clientY];
+            		
+            		_canvas.addEventListener('mousemove', _mouse_move, false);
+                    _canvas.addEventListener('mouseup', _mouse_up, false);
+                    _canvas.addEventListener('mouseout', _mouse_up, false);
+	            };
+            	
+                _canvas.addEventListener('mousedown', _mouse_down, false);
+            }
             
             return self;
         },

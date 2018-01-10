@@ -62,18 +62,30 @@
             let _objs = [{
                 radius: 50,
                 mass: 200,
-                color: 'rgb(239, 196, 52)',
-                p: [0, 0, 0],
+                color: 'rgb(255, 0, 0)',
+                p: [0, -100, 0],
                 v: [0, 0, 0]
             }, {
                 radius: 50,
                 mass: 200,
-                color: 'rgb(239, 196, 52)',
-                p: [0, 200, 0],
-                v: [0, -20, 0]
+                color: 'rgb(0, 255, 0)',
+                p: [0, 100, 0],
+                v: [0, 0, 0]
+            }, {
+                radius: 50,
+                mass: 200,
+                color: 'rgb(0, 0, 255)',
+                p: [0, 0, 100],
+                v: [0, 0, 0]
+            }, {
+                radius: 50,
+                mass: 200,
+                color: 'rgb(0, 255, 255)',
+                p: [0, 0, -100],
+                v: [0, 0, 0]
             }];
             T.init({
-                canvas: document.getElementById('main'),
+                canvas: document.querySelector('#main'),
                 camera: {
                     p: [600, 100, 100],
                     angle: 65
@@ -86,6 +98,7 @@
                     z: [-200, 200]
                 },
                 */
+                rotate: true,
                 elastic: true,
                 interval: 0.1,
                 gravity: true,
