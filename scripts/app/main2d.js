@@ -1,7 +1,7 @@
 define(require => {
     'use strict';
 
-	const GLOBAL = require('global');
+    const GLOBAL = require('global');
     const Vector = require('vector');
     const Object = require('object');
     const Matrix = require('matrix');
@@ -12,9 +12,9 @@ define(require => {
         return a.reduce((s, c) => [...s, Object.of(c)], []);
     };
 
-	const _next_position = (o, interval) => {
-		return o.p.add(o.v.scale(interval));
-	};
+    const _next_position = (o, interval) => {
+        return o.p.add(o.v.scale(interval));
+    };
     
     const _module = {
         
@@ -25,17 +25,17 @@ define(require => {
         _tm: undefined,
         _objs: [],
 
-	    _gravity_to(one, ...others) {
+        _gravity_to(one, ...others) {
             let self = this;
             const G = self._config.G;
-		    return others.reduce((v, o) => {
-			    let _d = o.p.add(one.p.minus());
-			    let _dl = _d.length;
-			    let _f = G * one.mass * o.mass / (_dl * _dl);
-			    v.append(Vector.of(_f, _d));
-			    return v;
-		    }, Vector.zero(2));
-	    },
+            return others.reduce((v, o) => {
+                let _d = o.p.add(one.p.minus());
+                let _dl = _d.length;
+                let _f = G * one.mass * o.mass / (_dl * _dl);
+                v.append(Vector.of(_f, _d));
+                return v;
+            }, Vector.zero(2));
+        },
         
         _clear() {
             let self = this;
@@ -114,11 +114,11 @@ define(require => {
             });
         },
 
-	    _draw() {
-		    let self = this;
+        _draw() {
+            let self = this;
             let _ctx = self._ctx;
-		    self._clear();
-		    self._objs.forEach(o => {
+            self._clear();
+            self._objs.forEach(o => {
                 _ctx.fillStyle = o.color;
                 _ctx.beginPath();
                 let [x, y] = o.p.values;
@@ -137,8 +137,8 @@ define(require => {
                 _ctx.arc(x, y, _radius, 0, ROUND);
                 _ctx.closePath();
                 _ctx.fill();
-		    });
-	    },
+            });
+        },
         
         init(config = {
             canvas: {},
