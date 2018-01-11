@@ -10,7 +10,6 @@
 <canvas id="main" width="600" height="500"></canvas>
 <div>
     <div class="button button-toggle" id="btn-start">Start</div>
-    <div class="button button-toggle" id="btn-rotate">Rotate</div>
     <div class="button" id="btn-reset">Reset</div>
     <div class="button" id="btn-refresh">Refresh</div>
 </div>
@@ -33,56 +32,50 @@
                 _btn.toggleClass('pressed');
             });
 
-            $('#btn-refresh').click(() => {
-                window.location.reload(true);
-            });
-
-            let _btn_start = $('#btn-start');
-
-            _btn_start.click(() => {
-                if ( _btn_start.hasClass('pressed') ) {
+            $('#btn-start').click(() => {
+                let _btn = $(event.target);
+                if ( _btn.hasClass('pressed') ) {
                     T.start();
-                    _btn_start.text('Stop');
+                    _btn.text('Stop');
                 } else {
                     T.stop();
-                    _btn_start.text('Start');
+                    _btn.text('Start');
                 }
             });
 
             $('#btn-reset').click(() => {
                 T.reset();
-                _btn_start.removeClass('pressed').text('Start');
+                $('#btn-start').removeClass('pressed').text('Start');
             });
 
-            $('#btn-rotate').click((event) => {
-                let _btn = $(event.target);
-                T.rotate(_btn.hasClass('pressed'));
+            $('#btn-refresh').click(() => {
+                window.location.reload(true);
             });
 
             let _objs = [{
-                radius: 50,
-                mass: 200,
+                radius: 20,
+                mass: 20,
                 color: 'rgb(255, 0, 0)',
                 p: [0, -100, 0],
-                v: [0, 0, 0]
+                v: [4, 0, 0]
             }, {
-                radius: 50,
-                mass: 200,
+                radius: 20,
+                mass: 20,
                 color: 'rgb(0, 255, 0)',
                 p: [0, 100, 0],
-                v: [0, 0, 0]
+                v: [-4, 0, 0]
             }, {
-                radius: 50,
-                mass: 200,
+                radius: 20,
+                mass: 20,
                 color: 'rgb(0, 0, 255)',
                 p: [0, 0, 100],
-                v: [0, 0, 0]
+                v: [0, 5, 0]
             }, {
-                radius: 50,
-                mass: 200,
+                radius: 20,
+                mass: 20,
                 color: 'rgb(0, 255, 255)',
                 p: [0, 0, -100],
-                v: [0, 0, 0]
+                v: [0, -5, 0]
             }];
             T.init({
                 canvas: document.querySelector('#main'),
@@ -91,14 +84,14 @@
                     angle: 65
                 },
                 objs: _objs,
-                /*
+
                 box: {
                     x: [-200, 200],
                     y: [-200, 200],
                     z: [-200, 200]
                 },
-                */
-                rotate: true,
+
+                control: true,
                 elastic: true,
                 interval: 0.1,
                 gravity: true,

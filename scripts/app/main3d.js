@@ -206,7 +206,7 @@ define(require => {
         init(config = {
 	        G: 5e+3,
 	        interval: 1,
-	        rotate: false,
+            control: false,
             elastic: true,
         	gravity: false
         }) {
@@ -215,9 +215,7 @@ define(require => {
             let _canvas = config.canvas;
             
             let _scene = _create_scene();
-            
             let _camera = _create_camera(config.camera.angle, _canvas.width / _canvas.height);
-            
             let _renderer = _create_renderer(_canvas);
             
             self._camera = _camera;
@@ -226,35 +224,44 @@ define(require => {
             
             self.reset();
             
-            if ( config.rotate ) {
-            	let [_cx, _cy] = [_canvas.width / 2, _canvas.height / 2];
+            if ( config.control ) {
             	let [_sx, _sy] = [];
-            	//let [_dphi, _dtheta] = [Math.PI / _canvas.width, Math.PI / _canvas.height];
-	            
-	            const _HALF_PI = Math.PI / 2;
             	
                 let _mouse_move = (event) => {
                     
                     let _phi = (_sx - event.clientX) * Math.PI / _canvas.width;
                     let _theta = (_sy - event.clientY) * Math.PI / _canvas.height;
-    
-                    console.log(`moving: (${event.clientX}, ${event.clientY}), angle: (${_phi}, ${_theta})`);
                     
+                    //console.log(`moving: (${event.clientX}, ${event.clientY}), angle: (${_phi}, ${_theta})`);
+                    
+                    let _camera = self._camera;
+                    
+                    /*
+                    let _spherical = new THREE.Spherical().setFromVector3(_camera.position);
+                    _spherical.theta -= _theta;
+                    _spherical.phi += _phi;
+                    _camera.position.setFromSpherical(_spherical);
+                    */
                     let _euler = new THREE.Euler(0, _theta, _phi, 'XYZ');
-                    self._camera.position.applyEuler(_euler);
-                    self._camera.lookAt(0, 0, 0);
+                    _camera.position.applyEuler(_euler);
+                    _camera.lookAt(0, 0, 0);
+                    _camera.updateMatrix();
                     self._renderer.render(self._scene, self._camera);
     
                     [_sx, _sy] = [event.clientX, event.clientY];
                 };
     
                 let _mouse_up = (event) => {
+                	event.preventDefault();
+                	
                     _canvas.removeEventListener('mousemove', _mouse_move, false);
                     _canvas.removeEventListener('mouseup', _mouse_up, false);
                     _canvas.removeEventListener('mouseout', _mouse_up, false);
                 };
             	
             	let _mouse_down = (event) => {
+            		event.preventDefault();
+            		
             		[_sx, _sy] = [event.clientX, event.clientY];
             		
             		_canvas.addEventListener('mousemove', _mouse_move, false);
