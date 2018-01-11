@@ -269,7 +269,23 @@ define(require => {
                     _canvas.addEventListener('mouseout', _mouse_up, false);
 	            };
             	
+            	let _mouse_wheel = (event) => {
+            		let _delta = event.wheelDelta / 10;
+                    let _camera = self._camera;
+                    let _spherical = new THREE.Spherical().setFromVector3(_camera.position);
+                    _spherical.radius -= _delta;
+                    if ( _spherical.radius < 0 ) {
+                    	_spherical.radius = 0;
+                    	return;
+                    }
+                    _camera.position.setFromSpherical(_spherical);
+                    _camera.lookAt(0, 0, 0);
+                    _camera.updateMatrix();
+                    self._renderer.render(self._scene, self._camera);
+	            };
+            	
                 _canvas.addEventListener('mousedown', _mouse_down, false);
+                _canvas.addEventListener('mousewheel', _mouse_wheel, false);
             }
             
             return self;
