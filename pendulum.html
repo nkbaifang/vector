@@ -1,0 +1,91 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>Single Pendulum Demo</title>
+    <script type="text/javascript" src="scripts/require.js"></script>
+    <link type="text/css" rel="stylesheet" href="style/common.css">
+</head>
+<body>
+<canvas id="main" width="700" height="500"></canvas>
+<div>
+    <div class="button button-toggle" id="btn-start">Start</div>
+    <div class="button" id="btn-reset">Reset</div>
+    <div class="button" id="btn-refresh">Refresh</div>
+</div>
+<script type="text/javascript">
+
+    require.config({
+        baseUrl: 'scripts/app',
+        paths: {
+            jquery: '../jquery-3.2.1.min',
+            three: '../three.min'
+        }
+    });
+
+    require(['jquery', 'pendulum'], ($, T) => {
+
+        $(() => {
+
+            $('.button-toggle').click(() => {
+                let _btn = $(event.target);
+                _btn.toggleClass('pressed');
+            });
+
+            $('#btn-start').click(() => {
+                let _btn = $(event.target);
+                if ( _btn.hasClass('pressed') ) {
+                    T.start();
+                    _btn.text('Stop');
+                } else {
+                    T.stop();
+                    _btn.text('Start');
+                }
+            });
+
+            $('#btn-reset').click(() => {
+                T.reset();
+                $('#btn-start').removeClass('pressed').text('Start');
+            });
+
+            $('#btn-refresh').click(() => {
+                window.location.reload(true);
+            });
+
+            let _objs = [{
+                radius: 20,
+                mass: 20,
+                color: 'rgb(255, 0, 0)',
+                p: [40, -40, 200]
+            }, {
+                radius: 20,
+                mass: 20,
+                color: 'rgb(0, 255, 0)',
+                p: [0, -80, 100]
+            }, {
+                radius: 20,
+                mass: 20,
+                color: 'rgb(0, 0, 255)',
+                p: [-40, -120, 0]
+            }];
+            T.init({
+                canvas: document.querySelector('#main'),
+                camera: {
+                    p: [800, 0, -100],
+                    angle: 65,
+                    near: 0.1,
+                    far: 2000
+                },
+                objs: _objs,
+
+                control: true,
+                elastic: true,
+                interval: 0.1,
+                K: 0.2
+            });
+
+        });
+    });
+</script>
+</body>
+</html>
