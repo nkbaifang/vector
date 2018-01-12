@@ -7,7 +7,7 @@
     <link type="text/css" rel="stylesheet" href="style/common.css">
 </head>
 <body>
-<canvas id="main" width="600" height="500"></canvas>
+<canvas id="main" width="700" height="500"></canvas>
 <div>
     <div class="button button-toggle" id="btn-start">Start</div>
     <div class="button" id="btn-reset">Reset</div>
@@ -23,7 +23,7 @@
         }
     });
 
-    require(['jquery', 'main3d'], ($, T) => {
+    require(['jquery', 'gravity3d'], ($, T) => {
 
         $(() => {
 
@@ -62,33 +62,29 @@
                 radius: 20,
                 mass: 20,
                 color: 'rgb(0, 255, 0)',
-                p: [0, 100, 0],
-                v: [-4, 0, 0]
+                p: [100, 100, 0],
+                v: [-8, 0, 0]
             }, {
                 radius: 20,
                 mass: 20,
                 color: 'rgb(0, 0, 255)',
                 p: [0, 0, 100],
                 v: [0, 5, 0]
-            }, {
-                radius: 20,
-                mass: 20,
-                color: 'rgb(0, 255, 255)',
-                p: [0, 0, -100],
-                v: [0, -5, 0]
             }];
             T.init({
                 canvas: document.querySelector('#main'),
                 camera: {
-                    p: [600, 100, 100],
-                    angle: 65
+                    p: [800, 100, 100],
+                    angle: 65,
+                    near: 0.1,
+                    far: 2000
                 },
                 objs: _objs,
 
                 box: {
-                    x: [-200, 200],
-                    y: [-200, 200],
-                    z: [-200, 200]
+                    x: [-300, 300],
+                    y: [-300, 300],
+                    z: [-300, 300]
                 },
 
                 control: true,

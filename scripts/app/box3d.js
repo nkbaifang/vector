@@ -19,8 +19,8 @@ define(require => {
         return _scene;
     };
     
-    const _create_camera = (angle = 75, aspect = 1.0) => {
-        let _camera = new THREE.PerspectiveCamera(angle, aspect, 0.5, 1000);
+    const _create_camera = (angle = 75, aspect = 1.0, near = 0.1, far = 1000) => {
+        let _camera = new THREE.PerspectiveCamera(angle, aspect, near, far);
         _camera.up.set(0, 0, 1);
         
         return _camera;
@@ -215,7 +215,7 @@ define(require => {
             let _canvas = config.canvas;
             
             let _scene = _create_scene();
-            let _camera = _create_camera(config.camera.angle, _canvas.width / _canvas.height);
+            let _camera = _create_camera(config.camera.angle, _canvas.width / _canvas.height, config.camera.near, config.camera.far);
             let _renderer = _create_renderer(_canvas);
             
             self._camera = _camera;
@@ -245,7 +245,7 @@ define(require => {
                     let _euler = new THREE.Euler(0, _theta, _phi, 'XYZ');
                     _camera.position.applyEuler(_euler);
                     _camera.lookAt(0, 0, 0);
-                    _camera.updateMatrix();
+                    _camera.updateProjectionMatrix();
                     self._renderer.render(self._scene, self._camera);
     
                     [_sx, _sy] = [event.clientX, event.clientY];
@@ -280,7 +280,7 @@ define(require => {
                     }
                     _camera.position.setFromSpherical(_spherical);
                     _camera.lookAt(0, 0, 0);
-                    _camera.updateMatrix();
+                    _camera.updateProjectionMatrix();
                     self._renderer.render(self._scene, self._camera);
                 };
                 
