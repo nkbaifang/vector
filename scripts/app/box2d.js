@@ -155,7 +155,7 @@ define(require => {
             
             let _canvas = config.canvas.dom;
             
-            self._ctx = _canvas.getContext("2d");
+            self._ctx = _canvas.getContext('2d');
             
             self.reset();
             
