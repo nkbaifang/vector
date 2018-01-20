@@ -52,9 +52,9 @@
                 window.location.reload(true);
             });
 
-            let _theta = Math.PI / 10;
+            let _theta = Math.PI / 60;
 
-            let _objs = [/*{
+            let _objs = [{
                 radius: 20,
                 mass: 20,
                 color: 'rgb(255, 0, 0)',
@@ -89,17 +89,17 @@
                 mass: 20,
                 color: 'rgb(255, 0, 0)',
                 p: [240, 2120, _theta]
-            },*/ {
+            }, {
                 radius: 20,
                 mass: 20,
                 color: 'rgb(255, 0, 0)',
-                p: [280, 240, _theta]
+                p: [280, 2140, _theta]
             }];
             T.init({
                 canvas: document.querySelector('#main'),
                 camera: {
-                    p: [1000, 0, -300],
-                    c: [0, 0, -150],
+                    p: [1000, 0, -2100],
+                    c: [0, 0, -2000],
                     angle: 65,
                     near: 0.1,
                     far: 2000

@@ -1,0 +1,91 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>Test</title>
+    <script type="text/javascript" src="scripts/require.js"></script>
+    <link type="text/css" rel="stylesheet" href="style/common.css">
+</head>
+<body>
+<canvas id="main" width="600" height="600"></canvas>
+<div>
+    <div class="button button-toggle" id="btn-start">Start</div>
+    <div class="button" id="btn-reset">Reset</div>
+</div>
+<script type="text/javascript">
+
+    require.config({
+        baseUrl: 'scripts/app',
+        paths: {
+            jquery: '../jquery-3.2.1.min'
+        }
+    });
+
+    require(['jquery', 'circle'], ($, M) => {
+
+        $(() => {
+
+            $('.button-toggle').click(() => {
+                let _btn = $(event.target);
+                _btn.toggleClass('pressed');
+            });
+
+            $('#btn-start').click(() => {
+                let _btn = $(event.target);
+                if ( _btn.hasClass('pressed') ) {
+                    M.start();
+                    _btn.text('Stop');
+                } else {
+                    M.stop();
+                    _btn.text('Start');
+                }
+            });
+
+            $('#btn-reset').click(() => {
+                M.stop();
+                M.reset();
+                $('#btn-start').removeClass('pressed').text('Start');
+            });
+
+            let _objs = [{
+                mass: 500,
+                radius: 10,
+                color: 'rgb(255, 0, 0)',
+                p: [0, 0],
+                v: [0, 0],
+                fixed: true
+            }, {
+                mass: 10,
+                radius: 4,
+                color: 'rgb(0, 255, 255)',
+                p: [250, 0],
+                v: [0, 100]
+            }];
+
+            let _canvas = document.querySelector('#main');
+
+            M.init({
+                canvas: {
+                    dom: _canvas,
+                    background: 'rgb(40, 40, 40)'
+                },
+                objs: _objs,
+                interval: 0.01,
+                gravity: true,
+                G: 5e+3,
+                circles: [{
+                    p: [_canvas.width / 2, _canvas.height / 2],
+                    r: 250,
+                    color: 'rgb(255, 255, 0)'
+                }],
+                transform: [
+                    1, 0,
+                    0, -1,
+                    _canvas.width / 2, _canvas.height / 2
+                ]
+            });
+        });
+    });
+</script>
+</body>
+</html>
