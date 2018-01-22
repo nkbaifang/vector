@@ -74,8 +74,7 @@ define(require => {
         let geometry = new THREE.Geometry();
         geometry.vertices.push(start);
         geometry.vertices.push(end);
-        let line = new THREE.Line(geometry, material);
-        return line;
+        return new THREE.Line(geometry, material);
     };
     
     const _module = {
@@ -129,7 +128,7 @@ define(require => {
             G: 5e+3,
             interval: 1,
             camera: {
-              c: [0, 0, 0]
+                c: [0, 0, 0]
             },
             control: false,
             elastic: true,
@@ -212,12 +211,17 @@ define(require => {
             let _config = self._config;
             
             self.stop();
+            self._renderer.clear();
+            
             self._theta = 0;
             self._camera.position.set(..._config.camera.p);
             self._camera.lookAt(..._config.camera.c);
             
-            self._renderer.clear();
             self._scene.remove(...self._objs);
+            self._objs.forEach(c => {
+               self._scene.remove(c.line);
+            });
+            
             self._objs.length = 0;
             let _objs = _create_objects(self._config.objs);
             self._objs.push(..._objs);

@@ -27,12 +27,27 @@
 
         $(() => {
 
-            $('.button-toggle').click(() => {
+            let _create_objects = (theta, length, count) => {
+                let i = 0;
+                let _result = [];
+                while ( i < count) {
+                    _result.push({
+                        radius: 20,
+                        mass: 20,
+                        color: 'rgb(255, 0, 0)',
+                        p: [i * 40, _length + i * 40, theta]
+                    });
+                    i++;
+                }
+                return _result;
+            };
+
+            $('.button-toggle').bind('click', () => {
                 let _btn = $(event.target);
                 _btn.toggleClass('pressed');
             });
 
-            $('#btn-start').click(() => {
+            $('#btn-start').bind('click', () => {
                 let _btn = $(event.target);
                 if ( _btn.hasClass('pressed') ) {
                     T.start();
@@ -43,63 +58,23 @@
                 }
             });
 
-            $('#btn-reset').click(() => {
+            $('#btn-reset').bind('click', () => {
                 T.reset();
                 $('#btn-start').removeClass('pressed').text('Start');
             });
 
-            $('#btn-refresh').click(() => {
+            $('#btn-refresh').bind('click', () => {
                 window.location.reload(true);
             });
 
-            let _theta = Math.PI / 60;
+            let _length = 400;
 
-            let _objs = [{
-                radius: 20,
-                mass: 20,
-                color: 'rgb(255, 0, 0)',
-                p: [0, 2000, _theta]
-            }, {
-                radius: 20,
-                mass: 20,
-                color: 'rgb(255, 0, 0)',
-                p: [40, 2020, _theta]
-            }, {
-                radius: 20,
-                mass: 20,
-                color: 'rgb(255, 0, 0)',
-                p: [80, 2040, _theta]
-            }, {
-                radius: 20,
-                mass: 20,
-                color: 'rgb(255, 0, 0)',
-                p: [120, 2060, _theta]
-            }, {
-                radius: 20,
-                mass: 20,
-                color: 'rgb(255, 0, 0)',
-                p: [160, 2080, _theta]
-            }, {
-                radius: 20,
-                mass: 20,
-                color: 'rgb(255, 0, 0)',
-                p: [200, 2100, _theta]
-            }, {
-                radius: 20,
-                mass: 20,
-                color: 'rgb(255, 0, 0)',
-                p: [240, 2120, _theta]
-            }, {
-                radius: 20,
-                mass: 20,
-                color: 'rgb(255, 0, 0)',
-                p: [280, 2140, _theta]
-            }];
+            let _objs = _create_objects(Math.PI / 30, _length, 10);
             T.init({
                 canvas: document.querySelector('#main'),
                 camera: {
-                    p: [1000, 0, -2100],
-                    c: [0, 0, -2000],
+                    p: [1000, 0, -_length - 100],
+                    c: [0, 0, -_length],
                     angle: 65,
                     near: 0.1,
                     far: 2000
