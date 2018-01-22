@@ -57,7 +57,7 @@ define(require => {
          */
         static of(len, v) {
             let _s = len / v.length;
-            return new Vector(Array.from(v._dim, x => x * _s));
+            return new Vector(v._dim.map(x => x * _s));
         }
 
         /**
@@ -190,7 +190,7 @@ define(require => {
          * @returns {Array}
          */
         get values() {
-            return Array.from(this._dim, x => x);
+            return Array.from(this._dim);
         }
 
         /**
@@ -209,7 +209,7 @@ define(require => {
          * @returns {Vector}
          */
         minus() {
-            return new Vector(Array.from(this._dim, x => -x));
+            return new Vector(this._dim.map(x => -x));
         }
 
         /**
@@ -220,7 +220,7 @@ define(require => {
          * @returns {Vector}
          */
         scale(s) {
-            return new Vector(Array.from(this._dim, x => x * s));
+            return new Vector(this._dim.map(x => x * s));
         }
 
         /**
