@@ -117,9 +117,7 @@ define(require => {
         move(t = 1) {
             let self = this;
             if ( !self.fixed ) {
-                let _v0 = self.v.copy();
-                self.v.append(self.a.scale(t)); // equivalent: v = v0 + a * t
-                //self.p.append(_v0.scale(t).add(self.a.scale(0.5 * t * t)));   // equivalent: s = v0 * t + 0.5 * a * t^2
+                self.v.append(self.a.scale(t));
                 self.p.append(self.v.scale(t));
             }
             return self;
