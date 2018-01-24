@@ -1,5 +1,5 @@
 
-define(require => {
+define(() => {
     'use strict';
 
     /**
@@ -209,7 +209,50 @@ define(require => {
             let _array = Array.from(self._values, x => multiply(s, x));
             return new Matrix(self.rows, self.cols, _array);
         }
-        
+    
+        /**
+         * Add this matrix with another one, and return the result.
+         *
+         * @param {Matrix} m
+         *      Another matrix.
+         *
+         * @param {Function} add
+         *      Addition function. Default is numerical addition.
+         *
+         * @returns {Matrix}
+         */
+        add(m, add = (a, b) => a + b) {
+            let self = this;
+            if ( self.rows !== m.rows && self.cols !== m.cols ) {
+                throw new Error('Cannot add two matrices in different size.');
+            }
+            
+            let _array = self._values.map((n, i) => add(n, m._values[i]));
+            return new Matrix(self.rows, self.cols, _array);
+        }
+    
+        /**
+         * Add another matrix to this.
+         *
+         * @param {Matrix} m
+         *      Another matrix.
+         *
+         * @param {Function} add
+         *      Addition function. Default is numerical addition.
+         *
+         * @returns {Matrix}
+         */
+        append(m, add = (a, b) => a + b) {
+            let self = this;
+            if ( self.rows !== m.rows && self.cols !== m.cols ) {
+                throw new Error('Cannot add two matrices in different size.');
+            }
+            self._values.forEach((n, i, a) => {
+                a[i] = add(n, m._values[i]);
+            });
+            return self;
+        }
+    
         /**
          * Multiply this matrix with another. This function does not change this matrix, and it just returns the result.
          *
