@@ -1,5 +1,4 @@
 define(require => {
-    'use strict';
 
     const Matrix = require('matrix');
     

@@ -1,6 +1,5 @@
 
 define(() => {
-    'use strict';
 
     /**
      * Matrix class
