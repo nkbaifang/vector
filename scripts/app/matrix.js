@@ -1,5 +1,9 @@
 
 define(() => {
+    
+    const _new_array = (length, value = 0) => Array.from({length: length}, () => value);
+    
+    const _INVALID_MATRIX = undefined;
 
     /**
      * Matrix class
@@ -35,12 +39,12 @@ define(() => {
          * @param {Array} array
          *      An array contains the matrix data, and the length must be a square number.
          *
-         * @returns {Matrix}
+         * @returns {Matrix|undefined}
          */
         static square(array = []) {
             let _rows = Math.floor(Math.sqrt(array.length));
             if ( _rows * _rows !== array.length ) {
-                throw new Error('Illegal arguments.');
+                return _INVALID_MATRIX;
             }
             return new Matrix(_rows, _rows, array);
         }
@@ -57,15 +61,35 @@ define(() => {
          * @param {*} zero
          *      Zero element. Default value is numerical zero.
          *
-         * @returns {Matrix}
+         * @returns {Matrix|undefined}
          */
         static zero(rows, cols, zero = 0) {
             if ( rows < 0 || cols < 0 ) {
-                throw new Error('Illegal arguments.');
+                return _INVALID_MATRIX;
             }
-            return new Matrix(rows, cols, Array.from({length: rows * cols}, () => zero));
+            return new Matrix(rows, cols, _new_array(rows * cols, zero));
         }
-        
+    
+        /**
+         * Create a diagonal matrix.
+         *
+         * @param {Array} array
+         *      Elements inside the main diagonal.
+         *
+         * @param {*} zero
+         *      Zero element. Default value is numerical zero.
+         *
+         * @returns {Matrix}
+         */
+        static diagonal(array, zero = 0) {
+            let n = array.length;
+            let _values = _new_array(n * n, zero);
+            array.forEach((x, i) => {
+                _values[i * n + i] = x;
+            });
+            return new Matrix(n, n, _values);
+        }
+    
         /**
          * Create a identity matrix.
          *
@@ -78,11 +102,11 @@ define(() => {
          * @param {*} zero
          *      Zero element. Default value is numerical zero.
          *
-         * @returns {Matrix}
+         * @returns {Matrix|undefined}
          */
         static identity(n, one = 1, zero = 0) {
             if ( n < 0  ) {
-                throw new Error('Illegal arguments.');
+                return _INVALID_MATRIX;
             }
             
             return new Matrix(n, n, Array.from({length: n * n}, (x, i) => Math.floor(i / n) === i % n ? one : zero));
@@ -122,6 +146,59 @@ define(() => {
             }
             return _result;
         }
+    
+        /**
+         * Whether this matrix is a square matrix.
+         *
+         * @returns {boolean}
+         */
+        get square() {
+            let self = this;
+            return self.rows === self.cols;
+        }
+    
+        /**
+         * Return trace of this matrix.
+         *
+         * @param {Function} add
+         *      Addition function. Default is numerical addition.
+         *
+         * @param {*} zero
+         *      Zero element. Default value is numerical zero.
+         *
+         * @returns {*}
+         *      The trace of this matrix. If this is not a square matrix, this function returns undefined.
+         */
+        trace(add = (a, b) => a + b, zero = 0) {
+            let self = this;
+            if ( self.rows !== self.cols ) {
+                return undefined;
+            }
+            
+            let _result = zero,
+                i = 0,
+                n = self.rows;
+            while ( i < n ) {
+                let _value = self._values[i * n + i];
+                _result = add(_result, _value);
+                i++;
+            }
+            return _result;
+        }
+        
+        submatrix(i, j) {
+            let self = this;
+            if ( j < 0 || j >= self._cols || i < 0 || i >= self._rows ) {
+                return _INVALID_MATRIX;
+            }
+            
+            let [_rows, _cols] = [self.rows, self.cols];
+            let _values = self._values.filter((n, index) => {
+                let [_i, _j] = [Math.floor(index / _cols), index % _cols];
+                return _i !== i && _j !== j;
+            });
+            return new Matrix(_rows - 1, _cols - 1, _values);
+        }
 
         /**
          * Return the item value.
@@ -137,7 +214,7 @@ define(() => {
         getValue(i, j) {
             let self = this;
             if ( j < 0 || j >= self._cols || i < 0 || i >= self._rows ) {
-                throw new Error('Index out of bound: (' + i + ', ' + j + ')');
+                return undefined;
             }
             return self._values[i * self._cols + j];
         }
@@ -156,11 +233,9 @@ define(() => {
         setValue(i, j, n) {
             let self = this;
             if ( j < 0 || j >= self._cols || i < 0 || i >= self._rows ) {
-                throw new Error('Index out of bound: (' + i + ', ' + j + ')');
+                return;
             }
-            if ( typeof n !== 'number' ) {
-                throw new Error('Invalid value type: ' + typeof n);
-            }
+            
             self._values[i * self._cols + j] = n;
         }
 
@@ -170,12 +245,12 @@ define(() => {
          * @param {Number} n
          *      Row index
          *
-         * @returns {Array}
+         * @returns {Array|undefined}
          */
         row(n) {
             let self = this;
             if ( n < 0 || n >= self._rows ) {
-                throw new Error('Index out of bound: row=' + n);
+                return undefined;
             }
             return self._values.slice(n, n + self._cols);
         }
@@ -186,12 +261,12 @@ define(() => {
          * @param {Number} n
          *      Column index
          *
-         * @returns {Array}
+         * @returns {Array|undefined}
          */
         col(n) {
             let self = this;
             if ( n < 0 || n >= self._cols ) {
-                throw new Error('Index out of bound: col=' + n);
+                return undefined;
             }
             return self._values.filter((x, i) => i % self._cols === n);
         }
@@ -199,8 +274,12 @@ define(() => {
         /**
          * Multiply this matrix with a scalar, and return the result.
          *
-         * @param {Number} s Scalar number
-         * @param {Function} multiply Multiplication function. Default is numerical multiplication.
+         * @param {Number} s
+         *      Scalar number
+         *
+         * @param {Function} multiply
+         *      Multiplication function. Default is numerical multiplication.
+         *
          * @returns {Matrix}
          */
         scale(s, multiply = (a, b) => a * b) {
@@ -223,7 +302,7 @@ define(() => {
         add(m, add = (a, b) => a + b) {
             let self = this;
             if ( self.rows !== m.rows && self.cols !== m.cols ) {
-                throw new Error('Cannot add two matrices in different size.');
+                return _INVALID_MATRIX;
             }
             
             let _array = self._values.map((n, i) => add(n, m._values[i]));
@@ -244,7 +323,7 @@ define(() => {
         append(m, add = (a, b) => a + b) {
             let self = this;
             if ( self.rows !== m.rows && self.cols !== m.cols ) {
-                throw new Error('Cannot add two matrices in different size.');
+                return self;
             }
             self._values.forEach((n, i, a) => {
                 a[i] = add(n, m._values[i]);
@@ -267,12 +346,12 @@ define(() => {
          * @param {*} zero
          *      Zero element. Default value is numerical zero.
          *
-         * @returns {Matrix}
+         * @returns {Matrix|undefined}
          */
         multiply(m, multiply = (a, b) => a * b, add = (a, b) => a + b, zero = 0) {
             let self = this;
             if ( self.cols !== m.rows ) {
-                throw new Error('Illegal matrix row: ' + m.rows);
+                return _INVALID_MATRIX;
             }
             
             let a = [];
