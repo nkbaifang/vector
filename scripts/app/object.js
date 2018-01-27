@@ -113,6 +113,17 @@ define(require => {
                 self._v = Vector.zero(_dim);
             }
         }
+        
+        gravityTo(g, ...others) {
+            let self = this;
+            return others.reduce((v, o) => {
+                let _d = o.p.add(self.p.minus());
+                let _dl = _d.length;
+                let _f = g * self.mass * o.mass / (_dl * _dl);
+                v.append(Vector.of(_f, _d));
+                return v;
+            }, Vector.zero(self.p.dim));
+        }
     
         move(t = 1) {
             let self = this;

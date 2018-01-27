@@ -185,11 +185,22 @@ define(() => {
             }
             return _result;
         }
-        
+    
+        /**
+         * Create a submatrix by deleting one row and one column.
+         *
+         * @param {Number} i
+         *      Row index.
+         *
+         * @param {Number} j
+         *      Column index.
+         *
+         * @returns {Matrix}
+         */
         submatrix(i, j) {
             let self = this;
             if ( j < 0 || j >= self._cols || i < 0 || i >= self._rows ) {
-                return _INVALID_MATRIX;
+                return self;
             }
             
             let [_rows, _cols] = [self.rows, self.cols];

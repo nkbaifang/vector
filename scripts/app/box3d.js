@@ -75,18 +75,6 @@ define(require => {
         
         _objs: [],
         
-        _gravity_to(one, ...others) {
-            let self = this;
-            const G = self._config.G;
-            return others.reduce((v, o) => {
-                let _d = o.p.add(one.p.minus());
-                let _dl = _d.length;
-                let _f = G * one.mass * o.mass / (_dl * _dl);
-                v.append(Vector.of(_f, _d));
-                return v;
-            }, Vector.zero(3));
-        },
-        
         _add_line(start, end, material) {
             let self = this;
             let geometry = new THREE.Geometry();
@@ -157,7 +145,7 @@ define(require => {
                 let _others = self._objs.reduce((a, s) => s === sphere ? [...a] : [...a, s.object], []);
 
                 if ( _config.gravity ) {
-                    let _f = self._gravity_to(o, ..._others);
+                    let _f = o.gravityTo(self._config.G, ..._others);
                     o.a = _f.scale(1.0 / o.mass);
                 }
 
