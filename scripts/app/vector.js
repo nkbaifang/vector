@@ -28,7 +28,7 @@ define(require => {
          *      Vector components
          */
         constructor(...args) {
-            this._dim = Array.from(args.length > 1 ? args : args[0]);
+            this._value = Array.from(args.length > 1 ? args : args[0]);
         }
 
         /**
@@ -56,7 +56,7 @@ define(require => {
          */
         static of(len, v) {
             let _s = len / v.length;
-            return new Vector(v._dim.map(x => x * _s));
+            return new Vector(v._value.map(x => x * _s));
         }
 
         /**
@@ -65,7 +65,7 @@ define(require => {
          * @returns {Number}
          */
         get dim() {
-            return this._dim.length;
+            return this._value.length;
         }
 
         /**
@@ -74,7 +74,7 @@ define(require => {
          * @returns {Number}
          */
         get length() {
-            return Math.hypot(...this._dim);
+            return Math.hypot(...this._value);
         }
 
         /**
@@ -90,7 +90,7 @@ define(require => {
          * @returns {String}
          */
         toString() {
-            return '<' + this._dim.join(',') + '>';
+            return '<' + this._value.join(',') + '>';
         }
 
         /**
@@ -101,7 +101,7 @@ define(require => {
         copy() {
             let self = this;
 
-            return new Vector(self._dim);
+            return new Vector(self._value);
         }
 
         /**
@@ -110,7 +110,7 @@ define(require => {
          * @returns {Boolean}
          */
         isZero() {
-            return this._dim.every(n => n === 0);
+            return this._value.every(n => n === 0);
         }
 
         /**
@@ -127,7 +127,7 @@ define(require => {
             let _av = [...vs, self];
             _assert(..._av);
 
-            let _t = _av.reduce((a, v) => [...a, ...v._dim], []);
+            let _t = _av.reduce((a, v) => [...a, ...v._value], []);
             let _r = _t.reduce((r, a, i) => {
                 r[i % r.length] += a;
                 return r;
@@ -147,10 +147,10 @@ define(require => {
             let self = this;
             _assert(...vs);
 
-            let len = self._dim.length;
-            let _a = vs.reduce((a, v) => [...a, ...v._dim], []);
+            let len = self._value.length;
+            let _a = vs.reduce((a, v) => [...a, ...v._value], []);
             _a.forEach((a, i) => {
-                self._dim[i % len] += a;
+                self._value[i % len] += a;
             });
             return self;
         }
@@ -166,8 +166,8 @@ define(require => {
          */
         expand(...ns) {
             let self = this;
-            let _dim = [...self._dim, ...ns];
-            return new Vector(_dim);
+            let _value = [...self._value, ...ns];
+            return new Vector(_value);
         }
 
         /**
@@ -177,7 +177,7 @@ define(require => {
          */
         reverse() {
             let self = this;
-            self._dim.forEach((n, i, a) => {
+            self._value.forEach((n, i, a) => {
                 a[i] = -n;
             });
             return self;
@@ -189,7 +189,7 @@ define(require => {
          * @returns {Array}
          */
         get values() {
-            return Array.from(this._dim);
+            return Array.from(this._value);
         }
 
         /**
@@ -199,7 +199,7 @@ define(require => {
          */
         set(...values) {
             let self = this;
-            self._dim = Array.from(values);
+            self._value = Array.from(values);
         }
 
         /**
@@ -208,7 +208,7 @@ define(require => {
          * @returns {Vector}
          */
         minus() {
-            return new Vector(this._dim.map(x => -x));
+            return new Vector(this._value.map(x => -x));
         }
 
         /**
@@ -219,7 +219,7 @@ define(require => {
          * @returns {Vector}
          */
         scale(s) {
-            return new Vector(this._dim.map(x => x * s));
+            return new Vector(this._value.map(x => x * s));
         }
 
         /**
@@ -229,7 +229,7 @@ define(require => {
          */
         dot(v) {
             _assert(this, v);
-            return this._dim.reduce((s, x, i) => s + x * v._dim[i], 0);
+            return this._value.reduce((s, x, i) => s + x * v._value[i], 0);
         }
 
         /**
@@ -247,10 +247,10 @@ define(require => {
                 throw new Error("Invalid parameters.");
             }
 
-            let m1 = new Matrix(1, self.dim, self._dim);
+            let m1 = new Matrix(1, self.dim, self._value);
             let m2 = (m instanceof Matrix) ? m : Matrix.square(m);
             let m3 = m1.multiply(m2);
-            self._dim = m3.row(0);
+            self._value = m3.row(0);
             return self;
         }
         
@@ -265,7 +265,7 @@ define(require => {
         matrix(column = false) {
             let self = this;
             let [_rows, _cols] = [column ? self.dim : 1, column ? 1 : self.dim];
-            return new Matrix(_rows, _cols, self._dim);
+            return new Matrix(_rows, _cols, self._value);
         }
     }
 
