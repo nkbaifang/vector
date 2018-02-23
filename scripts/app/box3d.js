@@ -153,7 +153,7 @@ define(require => {
 
                     let _dp = o.p.add(b.p.negative());
                     let _dpl = _dp.length;
-                    if ( _dpl < o.radius + b.radius ) {
+                    if ( _dpl <= o.radius + b.radius ) {
 
                         let _np1 = _next_position(o, _config.interval);
                         let _np2 = _next_position(b, _config.interval);

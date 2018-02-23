@@ -76,7 +76,7 @@ define(require => {
                     let _dp = o.p.add(b.p.negative());
                     
                     let _dpl = _dp.length;
-                    if ( _dpl < o.radius + b.radius ) {
+                    if ( _dpl <= o.radius + b.radius ) {
                         
                         let _np1 = _next_position(o, _config.interval);
                         let _np2 = _next_position(b, _config.interval);
@@ -107,8 +107,6 @@ define(require => {
             let _ctx = self._ctx;
             self._clear();
             self._objs.forEach(o => {
-                _ctx.fillStyle = o.color;
-                _ctx.beginPath();
                 let [x, y] = o.p.values;
                 let _radius = o.radius;
                 
@@ -121,7 +119,9 @@ define(require => {
                     }
                     //console.log(`object: p=(${x}, ${y}), r=${_radius}`);
                 }
-                
+    
+                _ctx.fillStyle = o.color;
+                _ctx.beginPath();
                 _ctx.arc(x, y, _radius, 0, ROUND);
                 _ctx.closePath();
                 _ctx.fill();
