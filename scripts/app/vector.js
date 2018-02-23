@@ -207,7 +207,7 @@ define(require => {
          *
          * @returns {Vector}
          */
-        minus() {
+        negative() {
             return new Vector(this._value.map(x => -x));
         }
 

@@ -27,12 +27,12 @@
 
         $(() => {
 
-            $('.button-toggle').click(() => {
+            $('.button-toggle').bind('click', (event) => {
                 let _btn = $(event.target);
                 _btn.toggleClass('pressed');
             });
 
-            $('#btn-start').click(() => {
+            $('#btn-start').bind('click', (event) => {
                 let _btn = $(event.target);
                 if ( _btn.hasClass('pressed') ) {
                     T.start();
@@ -43,12 +43,12 @@
                 }
             });
 
-            $('#btn-reset').click(() => {
+            $('#btn-reset').bind('click', () => {
                 T.reset();
                 $('#btn-start').removeClass('pressed').text('Start');
             });
 
-            $('#btn-refresh').click(() => {
+            $('#btn-refresh').bind('click', () => {
                 window.location.reload(true);
             });
 

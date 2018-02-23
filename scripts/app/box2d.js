@@ -73,24 +73,24 @@ define(require => {
                 
                 _others.forEach(b => {
                     
-                    let _dp = o.p.add(b.p.minus());
+                    let _dp = o.p.add(b.p.negative());
                     
                     let _dpl = _dp.length;
                     if ( _dpl < o.radius + b.radius ) {
                         
                         let _np1 = _next_position(o, _config.interval);
                         let _np2 = _next_position(b, _config.interval);
-                        if ( _np1.add(_np2.minus()).length < _dpl ) {
+                        if ( _np1.add(_np2.negative()).length < _dpl ) {
                             
                             let _sd = _dpl * _dpl;
-                            let _dv = o.v.add(b.v.minus());   // o.v - b.v
+                            let _dv = o.v.add(b.v.negative());   // o.v - b.v
                             
                             let _a = _dp.dot(_dv);
                             
                             let _m = 2.0 / (o.mass + b.mass);
                             
                             o.v.append(_dp.scale(-_m * b.mass * _a / _sd));
-                            b.v.append(_dp.minus().scale(-_m * o.mass * _a / _sd));
+                            b.v.append(_dp.negative().scale(-_m * o.mass * _a / _sd));
                         }
                     }
                     

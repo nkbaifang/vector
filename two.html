@@ -25,12 +25,12 @@
 
 			$(() => {
 
-				$('.button-toggle').bind('click', () => {
+				$('.button-toggle').bind('click', (event) => {
 					let _btn = $(event.target);
 					_btn.toggleClass('pressed');
 				});
 
-				$('#btn-start').bind('click', () => {
+				$('#btn-start').bind('click', (event) => {
 					let _btn = $(event.target);
 					if ( _btn.hasClass('pressed') ) {
 						M.start();

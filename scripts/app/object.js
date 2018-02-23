@@ -117,7 +117,7 @@ define(require => {
         gravityTo(g, ...others) {
             let self = this;
             return others.reduce((v, o) => {
-                let _d = o.p.add(self.p.minus());
+                let _d = o.p.add(self.p.negative());
                 let _dl = _d.length;
                 let _f = g * self.mass * o.mass / (_dl * _dl);
                 v.append(Vector.of(_f, _d));
