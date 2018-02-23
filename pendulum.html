@@ -11,7 +11,7 @@
 <div>
     <div class="button button-toggle" id="btn-start">Start</div>
     <div class="button" id="btn-reset">Reset</div>
-    <div class="button" id="btn-refresh">Refresh</div>
+    <div class="button" id="btn-reload">Reload</div>
 </div>
 <script type="text/javascript">
 
@@ -42,12 +42,12 @@
                 return _result;
             };
 
-            $('.button-toggle').bind('click', () => {
+            $('.button-toggle').bind('click', (event) => {
                 let _btn = $(event.target);
                 _btn.toggleClass('pressed');
             });
 
-            $('#btn-start').bind('click', () => {
+            $('#btn-start').bind('click', (event) => {
                 let _btn = $(event.target);
                 if ( _btn.hasClass('pressed') ) {
                     T.start();
@@ -63,7 +63,7 @@
                 $('#btn-start').removeClass('pressed').text('Start');
             });
 
-            $('#btn-refresh').bind('click', () => {
+            $('#btn-reload').bind('click', () => {
                 window.location.reload(true);
             });
 
