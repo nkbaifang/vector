@@ -1,0 +1,64 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>Test</title>
+    <script type="text/javascript" src="scripts/require.js"></script>
+    <link type="text/css" rel="stylesheet" href="style/common.css">
+</head>
+<body>
+<canvas id="main" width="600" height="600"></canvas>
+<div>
+    <div class="button" id="btn-clear">Clear</div>
+</div>
+<script type="text/javascript">
+
+    require.config({
+        baseUrl: 'scripts/app',
+        paths: {
+            jquery: '../jquery-3.2.1.min'
+        }
+    });
+
+    require(['jquery', 'symmetry'], ($, M) => {
+
+        $(() => {
+
+            $('#btn-clear').bind('click', (event) => {
+                M.clear();
+            });
+
+            $('#btn-reset').bind('click', () => {
+                M.stop();
+                M.reset();
+                $('#btn-start').removeClass('pressed').text('Start');
+            });
+
+            let _objs = [{
+                mass: 500,
+                radius: 10,
+                color: 'rgb(255, 0, 0)',
+                p: [0, 0],
+                v: [0, 0],
+                fixed: true
+            }, {
+                mass: 10,
+                radius: 4,
+                color: 'rgb(0, 255, 255)',
+                p: [250, 0],
+                v: [0, 100]
+            }];
+
+            let _canvas = document.querySelector('#main');
+
+            M.init({
+                canvas: {
+                    dom: _canvas
+                },
+                line: [1, 1.1, 0.6]
+            });
+        });
+    });
+</script>
+</body>
+</html>
