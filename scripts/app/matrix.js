@@ -156,6 +156,27 @@ define(() => {
             let self = this;
             return self.rows === self.cols;
         }
+        
+        /**
+         * Return the transpose matrix.
+         *
+         * @returns {Matrix}
+         */
+        get T() {
+            let self = this;
+            
+            let _array = Array.from(self._values);
+            
+            self._values.forEach((n, i) => {
+                let _i = Math.floor(i / self._cols);
+                let _j = i % self._cols;
+                
+                // [i * self._cols + j]
+                _array[_j * self._rows + _i] = n;
+            });
+            
+            return new Matrix(self._cols, self._rows, _array);
+        }
     
         /**
          * Return trace of this matrix.
@@ -382,27 +403,6 @@ define(() => {
             }
             
             return new Matrix(self.rows, m.cols, a);
-        }
-        
-        /**
-         * Return the transpose matrix.
-         *
-         * @returns {Matrix}
-         */
-        transpose() {
-            let self = this;
-            
-            let _array = Array.from(self._values);
-            
-            self._values.forEach((n, i) => {
-                let _i = Math.floor(i / self._cols);
-                let _j = i % self._cols;
-                
-                // [i * self._cols + j]
-                _array[_j * self._rows + _i] = n;
-            });
-            
-            return new Matrix(self._cols, self._rows, _array);
         }
     }
     
